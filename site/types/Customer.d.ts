@@ -9,6 +9,7 @@ export interface Member {
   uuid: string
   products: Products
   role: 'Owner' | 'Member'
+  done?: boolean
 }
 
 export interface Products {

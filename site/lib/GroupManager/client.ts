@@ -70,6 +70,14 @@ export class GroupManager {
     return this.yomo.send(event, data)
   }
 
+  isOwner = () => {
+    return this.currentMember?.role === 'Owner'
+  }
+
+  isDone = () => {
+    return Boolean(this.currentMember?.done)
+  }
+
   async fetchData() {
     const groupData = await axios
       .get(`/api/groups/group`, {
@@ -142,6 +150,23 @@ export class GroupManager {
 
   get currentMember() {
     return this.groupData?.members.find((item) => item.uuid === userId)
+  }
+
+  toggleMemberDone = async () => {
+    if (this.currentMember) {
+      this.currentMember.done = !this.currentMember.done
+
+      try {
+        const groupData = await axios
+          .post('/api/groups/update-member', {
+            cartId: this.groupId,
+            member: this.currentMember,
+          })
+          .then((data) => data.data.data)
+        this.yomo.send(`change-group-${this.groupId}`, groupData)
+        return groupData
+      } catch (error) {}
+    }
   }
 
   static openGroup = async (

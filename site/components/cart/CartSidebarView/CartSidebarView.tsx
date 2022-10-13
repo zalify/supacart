@@ -1,6 +1,6 @@
 import cn from 'clsx'
 import Link from 'next/link'
-import { FC, useMemo } from 'react'
+import { FC, useMemo, useState } from 'react'
 import s from './CartSidebarView.module.css'
 import CartItem from '../CartItem'
 import { Button, Text } from '@components/ui'
@@ -16,6 +16,7 @@ const CartSidebarView: FC = observer(() => {
   const { closeSidebar, setSidebarView } = useUI()
   const { data, isLoading, isEmpty } = useCart()
   const { gm } = useGroupManager()
+  const [doneLoading, setDoneLoading] = useState(false)
 
   const { price: subTotal } = usePrice(
     data && {
@@ -31,6 +32,12 @@ const CartSidebarView: FC = observer(() => {
   )
   const handleClose = () => closeSidebar()
   const goToCheckout = () => setSidebarView('CHECKOUT_VIEW')
+
+  const onToggleMemberDone = async () => {
+    setDoneLoading(true)
+    await gm?.toggleMemberDone()
+    setDoneLoading(false)
+  }
 
   const membersCartData = useMemo(() => {
     const members = gm?.groupData?.members
@@ -111,7 +118,10 @@ const CartSidebarView: FC = observer(() => {
                 ? membersCartData?.map((member, index) => {
                     return (
                       <div key={index}>
-                        <h3>{member.email}</h3>
+                        <h3>
+                          <p>{member.email}</p>
+                          <p>status: {member.done ? 'Done' : 'In progress'}</p>
+                        </h3>
                         <ul>
                           {member.products.map((item: any) => {
                             return (
@@ -161,13 +171,18 @@ const CartSidebarView: FC = observer(() => {
               <span>{total}</span>
             </div>
             <div>
-              {process.env.COMMERCE_CUSTOMCHECKOUT_ENABLED ? (
-                <Button Component="a" width="100%" onClick={goToCheckout}>
-                  Proceed to Checkout ({total})
-                </Button>
-              ) : (
+              {gm?.isOwner() ? (
                 <Button href="/checkout" Component="a" width="100%">
                   Proceed to Checkout
+                </Button>
+              ) : (
+                <Button
+                  onClick={onToggleMemberDone}
+                  Component="a"
+                  width="100%"
+                  loading={doneLoading}
+                >
+                  {gm?.isDone() ? 'Not done' : 'Done'}
                 </Button>
               )}
             </div>
