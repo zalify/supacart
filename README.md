@@ -10,8 +10,11 @@ PRESENCE_APP_ID=IKQgiOTkaEOLhOO
 PRESENCE_APP_SECRET=YZXuMwnwnUOJYBgejYRTGWUPqQKjTY
 ```
 
+### development
+
 ```bash
   pnpm install
+  pnpm run build ## 构建 shopify package
   cd site
   pnpm run dev
 

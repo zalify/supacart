@@ -21,9 +21,6 @@ const Quantity: FC<QuantityProps> = ({
 }) => {
   return (
     <div className="flex flex-row h-9">
-      <button className={s.actions} onClick={handleRemove}>
-        <Cross width={20} height={20} />
-      </button>
       <label className="w-full border-accent-2 border ml-2">
         <input
           className={s.input}
@@ -42,7 +39,7 @@ const Quantity: FC<QuantityProps> = ({
         onClick={decrease}
         className={s.actions}
         style={{ marginLeft: '-1px' }}
-        disabled={value <= 1}
+        disabled={value <= 0}
       >
         <Minus width={18} height={18} />
       </button>
@@ -51,7 +48,7 @@ const Quantity: FC<QuantityProps> = ({
         onClick={increase}
         className={cn(s.actions)}
         style={{ marginLeft: '-1px' }}
-        disabled={value < 1 || value >= max}
+        disabled={value < 0 || value >= max}
       >
         <Plus width={18} height={18} />
       </button>

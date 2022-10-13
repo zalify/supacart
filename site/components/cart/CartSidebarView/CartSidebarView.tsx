@@ -9,7 +9,6 @@ import { Bag, Cross, Check } from '@components/icons'
 import useCart from '@framework/cart/use-cart'
 import usePrice from '@framework/product/use-price'
 import SidebarLayout from '@components/common/SidebarLayout'
-import { LineItem } from '@commerce/types/cart'
 import { useGroupManager } from '@components/GroupManagerProvider'
 import { observer } from 'mobx-react'
 
@@ -33,13 +32,28 @@ const CartSidebarView: FC = observer(() => {
   const handleClose = () => closeSidebar()
   const goToCheckout = () => setSidebarView('CHECKOUT_VIEW')
 
-  // const membersCartData = useMemo(():LineItem[]=> {
-  //   const members = gm?.groupData?.members;
-  //   if (!members) return null;
-  //   return members.map(member=> {
-  //     return
-  //   })
-  // },[])
+  const membersCartData = useMemo(() => {
+    const members = gm?.groupData?.members
+
+    if (!members) return null
+    return members
+      .map((member) => {
+        return {
+          ...member,
+          products: member.products.items.map((item) => {
+            const lineItem = data?.lineItems.find(
+              (lineItem) => lineItem.variantId === item.variantId
+            )
+
+            return {
+              ...lineItem,
+              quantity: item.quantity,
+            }
+          }),
+        }
+      })
+      .sort((a, b) => (a.uuid === gm.userId ? -1 : 0))
+  }, [data?.lineItems, gm?.groupData?.members, gm?.userId])
 
   const error = null
   const success = null
@@ -93,13 +107,37 @@ const CartSidebarView: FC = observer(() => {
               </a>
             </Link>
             <ul className={s.lineItemsList}>
-              {data!.lineItems.map((item: any) => (
-                <CartItem
-                  key={item.id}
-                  item={item}
-                  currencyCode={data!.currency.code}
-                />
-              ))}
+              {membersCartData
+                ? membersCartData?.map((member, index) => {
+                    return (
+                      <div key={index}>
+                        <h3>{member.email}</h3>
+                        <ul>
+                          {member.products.map((item: any) => {
+                            return (
+                              <CartItem
+                                key={item.id}
+                                item={item}
+                                currencyCode={data!.currency.code}
+                                variant={
+                                  member.uuid === gm?.userId
+                                    ? 'default'
+                                    : 'display'
+                                }
+                              />
+                            )
+                          })}
+                        </ul>
+                      </div>
+                    )
+                  })
+                : data!.lineItems.map((item: any) => (
+                    <CartItem
+                      key={item.id}
+                      item={item}
+                      currencyCode={data!.currency.code}
+                    />
+                  ))}
             </ul>
           </div>
 

@@ -25,6 +25,7 @@ const userId = getUserId()
 
 export class GroupManager {
   groupId: string
+  userId = userId
   initialize: Promise<any>
   private yomo: InstanceType<typeof Presence>
 
@@ -94,15 +95,13 @@ export class GroupManager {
             type,
           },
         })
-        .then((data) => data.data)
+        .then((data) => data.data.data)
       this.yomo.send(`change-product-${this.groupId}`, {
         userId: userId,
         type,
         variantId,
       })
-      this.yomo.send(`change-group-${this.groupId}`, {
-        group: latestGroup,
-      })
+      this.yomo.send(`change-group-${this.groupId}`, latestGroup)
 
       this.updateProducts({ type, userId, variantId })
     } catch (error) {}

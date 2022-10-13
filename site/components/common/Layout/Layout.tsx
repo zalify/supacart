@@ -275,7 +275,6 @@ const GroupDisplay = observer(() => {
   }
 
   const isSameGroup = query.groupId === cookie
-  console.log('hasGroup', gm?.hasGroup())
 
   return (
     <div>
