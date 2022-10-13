@@ -169,14 +169,6 @@ const SyncCarts = () => {
       userId: string
       variantId: string | number
     }) => {
-      console.log('product change')
-
-      setTimeout(() => {
-        // FIXME update cart 之后 ，马上获取 cart 的数据是有延迟的
-        // 看看修改 useCart，直接改数据
-        cartRefetch.current()
-      }, 500)
-
       const member = gm.groupData?.members.find(
         (m) => m.uuid === payload.userId
       )
@@ -187,6 +179,15 @@ const SyncCarts = () => {
 
       if (member && product) {
         console.log(`${member.email} ${payload.type} ${product.name}`)
+      }
+
+      let timer = setTimeout(() => {
+        // FIXME update cart 之后 ，马上获取 cart 的数据是有延迟的
+        // 看看修改 useCart，直接改数据
+        cartRefetch.current()
+      }, 500)
+      return () => {
+        clearTimeout(timer)
       }
     }
     gm.on(`change-product-${gm.groupId}`, handler)
@@ -211,7 +212,7 @@ const SyncCarts = () => {
     return () => {
       gm.off(`change-group-${gm.groupId}`, handler)
     }
-  }, [gm])
+  }, [cartRefetch, gm])
 
   return <></>
 }
@@ -224,47 +225,60 @@ const GroupDisplay = observer(() => {
   const addItem = useAddItem()
   const [email, setEmail] = useState('')
   const cookie = getCartCookie()!
+  const [loading, setLoading] = useState(false)
 
   const onOpen = async () => {
     if (!email) {
       alert(`email 不能为空`)
       return
     }
-    let cartData = data
+    setLoading(true)
+    try {
+      let cartData = data
 
-    if (!cookie) {
-      cartData = await addItem({
-        quantity: 0,
-        variantId: '', // quantity =0 只会创建 checkout
-      })
-      Cookies.set(cartCookie, cartData.id)
+      if (!cookie) {
+        cartData = await addItem({
+          quantity: 0,
+          variantId: '', // quantity =0 只会创建 checkout
+        })
+        Cookies.set(cartCookie, cartData.id)
+      }
+      const cartId = cartData!.id
+      const products =
+        data?.lineItems.map((item) => ({
+          variantId: item.variantId,
+          quantity: item.quantity,
+        })) || []
+
+      await GroupManager.openGroup(cartId, email, { items: products })
+      setGm(new GroupManager(cartId))
+    } catch (error) {
+    } finally {
+      setLoading(false)
     }
-    const cartId = cartData!.id
-    const products =
-      data?.lineItems.map((item) => ({
-        variantId: item.variantId,
-        quantity: item.quantity,
-      })) || []
-
-    GroupManager.openGroup(cartId, email, { items: products })
-    setGm(new GroupManager(cartId))
   }
   const onJoin = async () => {
     if (!email) {
       alert(`email 不能为空`)
       return
     }
-    const groupData = await GroupManager.joinGroup(
-      query.groupId as string,
-      email,
-      { items: [] }
-    )
-    await cartRefetch.current()
-    const gm = new GroupManager(query.groupId as any)
-    gm.send(`change-group-${gm.groupId}`, {
-      group: groupData,
-    })
-    setGm(gm)
+    setLoading(true)
+    try {
+      const groupData = await GroupManager.joinGroup(
+        query.groupId as string,
+        email,
+        { items: [] }
+      )
+      await cartRefetch.current()
+      const gm = new GroupManager(query.groupId as any)
+      gm.send(`change-group-${gm.groupId}`, {
+        group: groupData,
+      })
+      setGm(gm)
+    } catch (error) {
+    } finally {
+      setLoading(false)
+    }
   }
   const onShare = () => {
     copy(
@@ -279,10 +293,22 @@ const GroupDisplay = observer(() => {
   return (
     <div>
       <p style={{ whiteSpace: 'pre', height: 300, overflowY: 'auto' }}>
-        {JSON.stringify(gm?.groupData, null, 2)}
+        {gm?.groupData && JSON.stringify(gm?.groupData, null, 2)}
       </p>
       {query.groupId && !isSameGroup && (
-        <Button onClick={onJoin}>Join group</Button>
+        <div>
+          <p>
+            <input
+              style={{ border: '1px solid #ccc' }}
+              type="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </p>
+
+          <Button onClick={onJoin} loading={loading}>
+            Join group
+          </Button>
+        </div>
       )}
       {gm?.hasGroup() ? (
         <div>
@@ -297,7 +323,11 @@ const GroupDisplay = observer(() => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </p>
-          {<Button onClick={onOpen}>Open group</Button>}
+          {
+            <Button onClick={onOpen} loading={loading}>
+              Open group
+            </Button>
+          }
         </div>
       )}
     </div>

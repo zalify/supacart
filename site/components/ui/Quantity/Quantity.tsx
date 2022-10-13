@@ -9,6 +9,7 @@ export interface QuantityProps {
   handleRemove: React.MouseEventHandler<HTMLButtonElement>
   handleChange: React.ChangeEventHandler<HTMLInputElement>
   max?: number
+  disabled?: boolean
 }
 
 const Quantity: FC<QuantityProps> = ({
@@ -18,15 +19,13 @@ const Quantity: FC<QuantityProps> = ({
   handleChange,
   handleRemove,
   max = 6,
+  disabled,
 }) => {
   return (
     <div className="flex flex-row h-9">
       <label className="w-full border-accent-2 border ml-2">
         <input
           className={s.input}
-          onChange={(e) =>
-            Number(e.target.value) < max + 1 ? handleChange(e) : () => {}
-          }
           value={value}
           type="number"
           max={max}
@@ -39,7 +38,7 @@ const Quantity: FC<QuantityProps> = ({
         onClick={decrease}
         className={s.actions}
         style={{ marginLeft: '-1px' }}
-        disabled={value <= 0}
+        disabled={value <= 0 || disabled}
       >
         <Minus width={18} height={18} />
       </button>
@@ -48,7 +47,7 @@ const Quantity: FC<QuantityProps> = ({
         onClick={increase}
         className={cn(s.actions)}
         style={{ marginLeft: '-1px' }}
-        disabled={value < 0 || value >= max}
+        disabled={value < 0 || value >= max || disabled}
       >
         <Plus width={18} height={18} />
       </button>

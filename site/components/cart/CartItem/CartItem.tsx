@@ -1,4 +1,11 @@
-import { ChangeEvent, FocusEventHandler, useEffect, useState } from 'react'
+import {
+  ChangeEvent,
+  FocusEventHandler,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import cn from 'clsx'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -10,6 +17,8 @@ import useUpdateItem from '@framework/cart/use-update-item'
 import useRemoveItem from '@framework/cart/use-remove-item'
 import Quantity from '@components/ui/Quantity'
 import { useGroupManager } from '@components/GroupManagerProvider'
+import useAddItem from '@framework/cart/use-add-item'
+import { debounce } from 'lodash'
 
 type ItemOption = {
   name: string
@@ -34,8 +43,11 @@ const CartItem = ({
   const [removing, setRemoving] = useState(false)
   const [quantity, setQuantity] = useState<number>(item.quantity)
   const { gm } = useGroupManager()
+  const addItem = useAddItem()
   const removeItem = useRemoveItem()
   const updateItem = useUpdateItem({ item })
+  const [updating, setUpdating] = useState(false)
+  const diffRef = useRef(0)
 
   const { price } = usePrice({
     amount: item.variant.price * item.quantity,
@@ -50,11 +62,25 @@ const CartItem = ({
     await updateItem({ quantity: Number(value) })
   }
 
+  const onCallUpdateItem = useMemo(() => {
+    return debounce(async (n: number) => {
+      diffRef.current = 0
+      try {
+        await addItem({
+          productId: String(item.id),
+          variantId: String(item.variantId),
+          quantity: n,
+        })
+        gm?.updateProduct(n > 0 ? 'add' : 'remove', item.variantId, Math.abs(n))
+      } catch (error) {}
+    }, 500)
+  }, [addItem, gm, item.id, item.variantId])
+
   const increaseQuantity = async (n = 1) => {
     const val = Number(quantity) + n
+    diffRef.current += n
     setQuantity(val)
-    await updateItem({ quantity: val })
-    gm?.updateProduct(n > 0 ? 'add' : 'remove', item.variantId)
+    onCallUpdateItem(diffRef.current)
   }
 
   const handleRemove = async () => {

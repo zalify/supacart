@@ -32,8 +32,10 @@ export class GroupManager {
       userId: string
       type: 'add' | 'remove'
       variantId: string | number
+      quantity?: number
     }
   ) => {
+    const { quantity = 1 } = payload
     const group: Group | null = await this.getGroup(groupId)
     if (!group) return null
     const matchMember = group.members.find(
@@ -45,9 +47,9 @@ export class GroupManager {
     )
     if (matchVariant) {
       if (payload.type === 'add') {
-        matchVariant.quantity += 1
+        matchVariant.quantity += quantity
       } else {
-        matchVariant.quantity = Math.max(matchVariant.quantity - 1, 0)
+        matchVariant.quantity = Math.max(matchVariant.quantity - quantity, 0)
       }
     } else {
       matchMember.products.items.push({

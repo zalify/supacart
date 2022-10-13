@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import type { MutationHook } from '@vercel/commerce/utils/types'
-import { CommerceError } from '@vercel/commerce/utils/errors'
 import useAddItem, { UseAddItem } from '@vercel/commerce/cart/use-add-item'
 import type { AddItemHook } from '@vercel/commerce/types/cart'
 import useCart from './use-cart'
@@ -20,15 +19,6 @@ export const handler: MutationHook<AddItemHook> = {
     query: checkoutLineItemAddMutation,
   },
   async fetcher({ input: item, options, fetch }) {
-    if (
-      item.quantity &&
-      (!Number.isInteger(item.quantity) || item.quantity! < 0)
-    ) {
-      throw new CommerceError({
-        message: 'The item quantity has to be a valid integer greater than 0',
-      })
-    }
-
     const lineItems =
       item.quantity === 0
         ? []

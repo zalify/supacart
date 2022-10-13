@@ -83,7 +83,8 @@ export class GroupManager {
 
   updateProduct = async (
     type: 'add' | 'remove',
-    variantId: number | string
+    variantId: number | string,
+    quantity: number = 1
   ) => {
     try {
       const latestGroup = await axios
@@ -93,6 +94,7 @@ export class GroupManager {
             userId,
             variantId,
             type,
+            quantity,
           },
         })
         .then((data) => data.data.data)
