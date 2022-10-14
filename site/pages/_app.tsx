@@ -7,9 +7,7 @@ import type { AppProps } from 'next/app'
 import { Head } from '@components/common'
 import { ManagedUIContext } from '@components/ui/context'
 import { GroupManagerProvider } from '@components/GroupManagerProvider'
-import { GroupManager } from '@lib/GroupManager/client'
 
-GroupManager.initCookie()
 const Noop: FC<{ children?: ReactNode }> = ({ children }) => <>{children}</>
 
 export default function MyApp({ Component, pageProps }: AppProps) {
@@ -22,7 +20,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head />
-      <style>{`nextjs-portal { display: none}`}</style>
+      <style>{`nextjs-portal { display: none} body {overflow:auto !important}`}</style>
       <GroupManagerProvider>
         <ManagedUIContext>
           <Layout pageProps={pageProps}>

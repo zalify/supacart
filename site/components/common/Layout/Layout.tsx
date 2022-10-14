@@ -131,11 +131,9 @@ const Layout: React.FC<Props> = ({
     <CommerceProvider locale={locale}>
       <div className={cn(s.root)}>
         <Navbar links={navBarlinks} />
-        <main className="fit">
-          <GroupDisplay />
-          <SyncCarts />
-          {children}
-        </main>
+        <GroupDisplay />
+        <SyncCarts />
+        <main className="fit">{children}</main>
         <Footer pages={pageProps.pages} />
         <ModalUI />
         <CheckoutProvider>
@@ -158,6 +156,7 @@ const Layout: React.FC<Props> = ({
 
 const SyncCarts = observer(() => {
   const { data, isLoading, isEmpty, mutate } = useCart()
+  console.log('complete', data?.completedAt)
 
   const cartData = useRefState(data)
   const { gm } = useGroupManager()
@@ -205,11 +204,12 @@ const SyncCarts = observer(() => {
     }
   }, [cartRefetch, gm])
 
+  const isCheckout = gm?.isCheckout()
   useEffect(() => {
     if (!gm) return
     let timer: NodeJS.Timeout
     const loop = async () => {
-      if (gm.isCheckout()) {
+      if (isCheckout) {
         if (data?.completedAt) {
           // make completed
           await gm.complete()
@@ -227,7 +227,7 @@ const SyncCarts = observer(() => {
         clearTimeout(timer)
       }
     }
-  }, [cartRefetch, data, gm])
+  }, [cartRefetch, data, gm, isCheckout])
 
   return <></>
 })
@@ -237,7 +237,7 @@ const GroupDisplay = observer(() => {
   const { data, mutate } = useCart()
   const cartRefetch = useRefState(mutate)
   const { query } = useRouter()
-  const { addItem } = useShopifyCart()
+  const { addProductItem } = useShopifyCart()
   const [email, setEmail] = useState('')
   const cookie = getCartCookie()!
   const [loading, setLoading] = useState(false)
@@ -252,7 +252,7 @@ const GroupDisplay = observer(() => {
       let cartData = data
 
       if (!cookie) {
-        cartData = await addItem({
+        cartData = await addProductItem({
           quantity: 0,
           variantId: '', // 没有 variantId && quantity =0 只会创建 checkout
         })
@@ -264,8 +264,11 @@ const GroupDisplay = observer(() => {
           quantity: item.quantity,
         })) || []
 
-      await GroupManager.openGroup(cartId, email, { items: products })
-      setGm(new GroupManager(cartId))
+      const group = await GroupManager.openGroup(cartId, email, {
+        items: products,
+      })
+
+      setGm(new GroupManager(group.id))
     } catch (error) {
     } finally {
       setLoading(false)
@@ -283,8 +286,9 @@ const GroupDisplay = observer(() => {
         email,
         { items: [] }
       )
+
       await cartRefetch.current()
-      const gm = new GroupManager(query.groupId as any)
+      const gm = new GroupManager(groupData.id)
       gm.send(`change-group-${gm.groupId}`, groupData)
       setGm(gm)
     } catch (error) {
@@ -295,8 +299,8 @@ const GroupDisplay = observer(() => {
   const onShare = () => {
     copy(
       location.search.startsWith('?')
-        ? location.href + `&groupId=${encodeURIComponent(gm!.groupId)}`
-        : location.href + `?groupId=${encodeURIComponent(gm!.groupId)}`
+        ? location.href + `&g=${encodeURIComponent(gm!.groupId)}`
+        : location.href + `?g=${encodeURIComponent(gm!.groupId)}`
     )
   }
 
@@ -314,7 +318,7 @@ const GroupDisplay = observer(() => {
       <p>
         <Button onClick={onRest}>Reset to new</Button>
       </p>
-      <p>
+      <div>
         {gm?.isInCart() && !isSameGroup && (
           <Button onClick={onJoin} loading={loading}>
             {'Join group'}
@@ -326,7 +330,7 @@ const GroupDisplay = observer(() => {
         {gm?.isComplete() && (
           <span style={{ color: 'red', fontSize: 30 }}>group has complete</span>
         )}
-      </p>
+      </div>
       {query.groupId && !isSameGroup && (
         <div>
           <p>

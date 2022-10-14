@@ -160,14 +160,6 @@ export class GroupManager {
     return this.groupData?.status === 'completed'
   }
 
-  static initCookie() {
-    if (typeof window === 'undefined') return
-    const groupId = this.getGroupId()
-    if (groupId && groupId !== getCartCookie()) {
-      Cookies.set(SHOPIFY_CHECKOUT_ID_COOKIE, groupId)
-    }
-  }
-
   static getGroupId = () => {
     if (typeof window === 'undefined') return
     return window.localStorage.getItem(GROUPId_KEY)
@@ -198,7 +190,7 @@ export class GroupManager {
   }
 
   static openGroup = async (
-    groupId: string,
+    cartId: string,
     email: string,
     products: Member['products']
   ) => {
@@ -209,14 +201,16 @@ export class GroupManager {
       uuid: userId,
       products: products,
     }
-    try {
-      await axios.post('/api/groups/new', {
-        cartId: groupId,
+    const data = (await axios
+      .post('/api/groups/new', {
+        cartId: cartId,
         member,
       })
-      Cookies.set(SHOPIFY_CHECKOUT_ID_COOKIE, groupId)
-      localStorage.setItem(GROUPId_KEY, groupId)
-    } catch (error) {}
+      .then((data) => data.data.data)) as Group
+
+    Cookies.set(SHOPIFY_CHECKOUT_ID_COOKIE, data.cartId)
+    localStorage.setItem(GROUPId_KEY, data.id)
+    return data
   }
 
   leaveGroup = () => {
@@ -235,19 +229,18 @@ export class GroupManager {
       uuid: userId,
       products: products,
     }
-    try {
-      const groupData = await axios
-        .post('/api/groups/join', {
-          cartId: groupId,
-          member,
-        })
-        .then((data) => data.data.data)
+    const groupData = (await axios
+      .post('/api/groups/join', {
+        cartId: groupId,
+        member,
+      })
+      .then((data) => data.data.data)) as Group
 
-      localStorage.setItem(GROUPId_KEY, groupId)
+    localStorage.setItem(GROUPId_KEY, groupId)
+    console.log(groupData.cartId, groupData)
 
-      Cookies.set(SHOPIFY_CHECKOUT_ID_COOKIE, groupId)
-      return groupData
-    } catch (error) {}
+    Cookies.set(SHOPIFY_CHECKOUT_ID_COOKIE, groupData.cartId)
+    return groupData
   }
 
   destroy() {
@@ -301,14 +294,15 @@ export class GroupManager {
     Cookies.remove(SHOPIFY_CHECKOUT_ID_COOKIE)
     Cookies.remove(SHOPIFY_CHECKOUT_URL_COOKIE)
     window.location.replace('/')
+    console.log('reset')
   }
 
   beginCheckout = async () => {
-    const latestGroup = await axios
+    const latestGroup = (await axios
       .post('/api/groups/checkout', {
         cartId: this.groupId,
       })
-      .then((data) => data.data.data)
+      .then((data) => data.data.data)) as Group
 
     this.yomo.send(`change-group-${this.groupId}`, latestGroup)
 
@@ -319,11 +313,11 @@ export class GroupManager {
 
   resetToInCart = async () => {
     if (this.isComplete()) return
-    const latestGroup = await axios
+    const latestGroup = (await axios
       .post('/api/groups/cart', {
         cartId: this.groupId,
       })
-      .then((data) => data.data.data)
+      .then((data) => data.data.data)) as Group
 
     this.yomo.send(`change-group-${this.groupId}`, latestGroup)
   }

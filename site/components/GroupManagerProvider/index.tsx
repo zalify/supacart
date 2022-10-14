@@ -1,6 +1,4 @@
-import { SHOPIFY_CHECKOUT_ID_COOKIE } from '@framework/const'
 import { GroupManager } from '@lib/GroupManager/client'
-import Cookies from 'js-cookie'
 import { useRouter } from 'next/router'
 import React, { useContext, useEffect, useState } from 'react'
 
@@ -14,8 +12,7 @@ export const GroupManagerProvider: React.FC<{
 }> = (props) => {
   const { query } = useRouter()
 
-  const groupId =
-    (query.groupId as string) || Cookies.get(SHOPIFY_CHECKOUT_ID_COOKIE)
+  const groupId = (query.g as string) || GroupManager.getGroupId()
   const [gm, setGm] = useState<GroupManager | null>(null)
 
   useEffect(() => {

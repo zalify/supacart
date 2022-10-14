@@ -52,16 +52,19 @@ const CartSidebarView: FC = observer(() => {
       .map((member) => {
         return {
           ...member,
-          products: member.products.items.map((item) => {
-            const lineItem = data?.lineItems.find(
-              (lineItem) => lineItem.variantId === item.variantId
-            )
+          products: member.products.items
+            .map((item) => {
+              const lineItem = data?.lineItems.find(
+                (lineItem) => lineItem.variantId === item.variantId
+              )
+              if (!lineItem) return null
 
-            return {
-              ...lineItem,
-              quantity: item.quantity,
-            }
-          }),
+              return {
+                ...lineItem,
+                quantity: item.quantity,
+              }
+            })
+            .filter(Boolean),
         }
       })
       .sort((a, b) => (a.uuid === gm.userId ? -1 : 0))
@@ -206,20 +209,38 @@ const CartSidebarView: FC = observer(() => {
                     </>
                   )
                 ) : (
-                  <Button
-                    onClick={onToggleMemberDone}
-                    Component="a"
-                    width="100%"
-                    loading={doneLoading}
-                  >
-                    <p>
-                      {gm.isInCart() ? (
+                  <>
+                    {gm.isInCart() && (
+                      <Button
+                        onClick={onToggleMemberDone}
+                        Component="a"
+                        width="100%"
+                        loading={doneLoading}
+                      >
                         <>{gm.isDone() ? 'Not done' : 'Done'}</>
-                      ) : null}
-                    </p>
-                    <p> {gm.isCheckout() && 'await to owner pay'}</p>
-                    <p> {gm.isComplete() && 'owner has payed'}</p>
-                  </Button>
+                      </Button>
+                    )}
+                    {gm.isCheckout() && (
+                      <Button
+                        disabled
+                        Component="a"
+                        width="100%"
+                        loading={doneLoading}
+                      >
+                        await to owner pay
+                      </Button>
+                    )}
+                    {gm.isComplete() && (
+                      <Button
+                        disabled
+                        Component="a"
+                        width="100%"
+                        loading={doneLoading}
+                      >
+                        owner has payed
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             ) : (

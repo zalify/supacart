@@ -1,16 +1,19 @@
 import { redis } from '@lib/redis'
+import { nanoid } from 'nanoid'
 import { Member, Group } from 'types/Customer'
 
 export class GroupManager {
   static getKey = (key: string) => `group_${key}`
 
   static newGroup = async (cartId: string, owner: Member) => {
+    const shortenId = nanoid(10)
     const group: Group = {
-      groupId: cartId,
+      id: shortenId,
+      cartId: cartId,
       members: [owner],
       status: 'cart',
     }
-    await redis.set(this.getKey(cartId), JSON.stringify(group))
+    await redis.set(this.getKey(shortenId), JSON.stringify(group))
     return group
   }
 
@@ -52,6 +55,12 @@ export class GroupManager {
         matchVariant.quantity += quantity
       } else {
         matchVariant.quantity = Math.max(matchVariant.quantity - quantity, 0)
+      }
+
+      if (matchVariant?.quantity === 0) {
+        matchMember.products.items = matchMember.products.items.filter(
+          (item) => item !== matchVariant
+        )
       }
     } else {
       matchMember.products.items.push({

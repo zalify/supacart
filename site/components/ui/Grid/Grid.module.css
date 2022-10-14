@@ -2,7 +2,7 @@
   @apply grid grid-cols-1 gap-0;
 }
 .root > * {
-  @apply row-span-1 bg-transparent box-border overflow-hidden;
+  @apply row-span-1 bg-transparent box-border;
   height: 500px;
   max-height: 800px;
 }
