@@ -293,6 +293,7 @@ export class GroupManager {
     localStorage.setItem(GROUPId_KEY, '')
     Cookies.remove(SHOPIFY_CHECKOUT_ID_COOKIE)
     Cookies.remove(SHOPIFY_CHECKOUT_URL_COOKIE)
+    Cookies.remove(USER_SESSION_ID)
     window.location.replace('/')
     console.log('reset')
   }

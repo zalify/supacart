@@ -281,11 +281,9 @@ const GroupDisplay = observer(() => {
     }
     setLoading(true)
     try {
-      const groupData = await GroupManager.joinGroup(
-        query.groupId as string,
-        email,
-        { items: [] }
-      )
+      const groupData = await GroupManager.joinGroup(query.g as string, email, {
+        items: [],
+      })
 
       await cartRefetch.current()
       const gm = new GroupManager(groupData.id)

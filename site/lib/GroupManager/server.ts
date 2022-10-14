@@ -28,6 +28,7 @@ export class GroupManager {
       group.members.push(member)
     }
     await redis.set(this.getKey(groupId), JSON.stringify(group))
+
     return group
   }
 
