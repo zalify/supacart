@@ -1,5 +1,4 @@
 import s from './ProductSidebar.module.css'
-import { useAddItem, useCart } from '@framework/cart'
 import { FC, useEffect, useState } from 'react'
 import { ProductOptions } from '@components/product'
 import type { Product } from '@commerce/types/product'
@@ -9,7 +8,7 @@ import {
   selectDefaultOptionFromProduct,
   SelectedOptions,
 } from '../helpers'
-import { useGroupManager } from '@components/GroupManagerProvider'
+import { useShopifyCart } from '@lib/hooks/useShopifyCart'
 
 interface ProductSidebarProps {
   product: Product
@@ -17,8 +16,7 @@ interface ProductSidebarProps {
 }
 
 const ProductSidebar: FC<ProductSidebarProps> = ({ product, className }) => {
-  const addItem = useAddItem()
-  const { gm } = useGroupManager()
+  const { addItem } = useShopifyCart()
   const { openSidebar, setSidebarView } = useUI()
   const [loading, setLoading] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({})
@@ -35,7 +33,7 @@ const ProductSidebar: FC<ProductSidebarProps> = ({ product, className }) => {
         productId: String(product.id),
         variantId: String(variant ? variant.id : product.variants[0]?.id),
       })
-      gm?.updateProduct('add', variant ? variant.id : product.variants[0]?.id)
+
       setSidebarView('CART_VIEW')
       openSidebar()
       setLoading(false)

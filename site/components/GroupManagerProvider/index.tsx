@@ -1,4 +1,7 @@
+import { SHOPIFY_CHECKOUT_ID_COOKIE } from '@framework/const'
 import { GroupManager } from '@lib/GroupManager/client'
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/router'
 import React, { useContext, useEffect, useState } from 'react'
 
 export const GroupManagerContext = React.createContext<{
@@ -7,14 +10,17 @@ export const GroupManagerContext = React.createContext<{
 }>({ gm: null, setGm: () => {} })
 
 export const GroupManagerProvider: React.FC<{
-  groupId?: string | null
   children: React.ReactNode
 }> = (props) => {
+  const { query } = useRouter()
+
+  const groupId =
+    (query.groupId as string) || Cookies.get(SHOPIFY_CHECKOUT_ID_COOKIE)
   const [gm, setGm] = useState<GroupManager | null>(null)
 
   useEffect(() => {
-    if (props.groupId) {
-      const newGm = new GroupManager(props.groupId)
+    if (groupId) {
+      const newGm = new GroupManager(groupId)
       setGm(newGm)
       return () => {
         newGm.destroy()
@@ -22,7 +28,7 @@ export const GroupManagerProvider: React.FC<{
     } else {
       setGm(null)
     }
-  }, [props.groupId])
+  }, [groupId])
 
   return (
     <GroupManagerContext.Provider

@@ -8,6 +8,7 @@ export class GroupManager {
     const group: Group = {
       groupId: cartId,
       members: [owner],
+      status: 'cart',
     }
     await redis.set(this.getKey(cartId), JSON.stringify(group))
     return group
@@ -15,6 +16,7 @@ export class GroupManager {
 
   static updateMember = async (groupId: string, member: Member) => {
     const group: Group | null = await this.getGroup(groupId)
+
     if (!group) return null
     const matchMember = group.members.find((item) => item.uuid === member.uuid)
     if (matchMember) {
@@ -66,6 +68,40 @@ export class GroupManager {
     const groupString = await redis.get(this.getKey(groupId))
     if (!groupString) return null
     const group: Group = JSON.parse(groupString)
+    return group
+  }
+
+  static beginCheckout = async (groupId: string) => {
+    const group: Group | null = await this.getGroup(groupId)
+
+    if (!group) return null
+    if (group.status === 'cart') {
+      group.status = 'checkout'
+      await redis.set(this.getKey(groupId), JSON.stringify(group))
+    }
+
+    return group
+  }
+
+  static resetToInCart = async (groupId: string) => {
+    const group: Group | null = await this.getGroup(groupId)
+
+    if (!group) return null
+    if (group.status === 'checkout') {
+      group.status = 'cart'
+      await redis.set(this.getKey(groupId), JSON.stringify(group))
+    }
+
+    return group
+  }
+
+  static complete = async (groupId: string) => {
+    const group: Group | null = await this.getGroup(groupId)
+
+    if (!group) return null
+    group.status = 'completed'
+    await redis.set(this.getKey(groupId), JSON.stringify(group))
+
     return group
   }
 }

@@ -23,6 +23,9 @@ const Quantity: FC<QuantityProps> = ({
 }) => {
   return (
     <div className="flex flex-row h-9">
+      {/* <button className={s.actions} onClick={handleRemove}>
+        <Cross width={20} height={20} />
+      </button> */}
       <label className="w-full border-accent-2 border ml-2">
         <input
           className={s.input}

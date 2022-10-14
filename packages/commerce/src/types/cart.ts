@@ -135,6 +135,8 @@ export interface Cart {
    *  The date and time when the cart was created.
    */
   createdAt: string
+
+  completedAt?: string
   /**
    * The currency used for this cart */
   currency: { code: string }

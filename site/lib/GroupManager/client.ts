@@ -5,8 +5,12 @@ import { nanoid } from 'nanoid'
 import { isEqual } from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { cartCookie } from '@lib/getCartCookie'
-import { makeAutoObservable, toJS } from 'mobx'
+import { getCartCookie } from '@lib/getCartCookie'
+import { makeAutoObservable } from 'mobx'
+import {
+  SHOPIFY_CHECKOUT_ID_COOKIE,
+  SHOPIFY_CHECKOUT_URL_COOKIE,
+} from '@framework/const'
 
 const USER_SESSION_ID = 'USER_SESSION_ID'
 const GROUPId_KEY = 'GROUPId_KEY'
@@ -144,8 +148,32 @@ export class GroupManager {
     this.groupData = group
   }
 
+  isInCart = () => {
+    return this.groupData?.status === 'cart'
+  }
+
+  isCheckout = () => {
+    return this.groupData?.status === 'checkout'
+  }
+
+  isComplete = () => {
+    return this.groupData?.status === 'completed'
+  }
+
+  static initCookie() {
+    if (typeof window === 'undefined') return
+    const groupId = this.getGroupId()
+    if (groupId && groupId !== getCartCookie()) {
+      Cookies.set(SHOPIFY_CHECKOUT_ID_COOKIE, groupId)
+    }
+  }
+
+  static getGroupId = () => {
+    if (typeof window === 'undefined') return
+    return window.localStorage.getItem(GROUPId_KEY)
+  }
   hasGroup = () => {
-    return localStorage.getItem(GROUPId_KEY)
+    return window.localStorage.getItem(GROUPId_KEY)
   }
 
   get currentMember() {
@@ -186,6 +214,7 @@ export class GroupManager {
         cartId: groupId,
         member,
       })
+      Cookies.set(SHOPIFY_CHECKOUT_ID_COOKIE, groupId)
       localStorage.setItem(GROUPId_KEY, groupId)
     } catch (error) {}
   }
@@ -216,7 +245,7 @@ export class GroupManager {
 
       localStorage.setItem(GROUPId_KEY, groupId)
 
-      Cookies.set(cartCookie, groupId)
+      Cookies.set(SHOPIFY_CHECKOUT_ID_COOKIE, groupId)
       return groupData
     } catch (error) {}
   }
@@ -265,5 +294,48 @@ export class GroupManager {
       }
     })
     return next
+  }
+
+  reset() {
+    localStorage.setItem(GROUPId_KEY, '')
+    Cookies.remove(SHOPIFY_CHECKOUT_ID_COOKIE)
+    Cookies.remove(SHOPIFY_CHECKOUT_URL_COOKIE)
+    window.location.replace('/')
+  }
+
+  beginCheckout = async () => {
+    const latestGroup = await axios
+      .post('/api/groups/checkout', {
+        cartId: this.groupId,
+      })
+      .then((data) => data.data.data)
+
+    this.yomo.send(`change-group-${this.groupId}`, latestGroup)
+
+    setTimeout(() => {
+      window.location.assign('/checkout')
+    }, 100)
+  }
+
+  resetToInCart = async () => {
+    if (this.isComplete()) return
+    const latestGroup = await axios
+      .post('/api/groups/cart', {
+        cartId: this.groupId,
+      })
+      .then((data) => data.data.data)
+
+    this.yomo.send(`change-group-${this.groupId}`, latestGroup)
+  }
+
+  complete = async () => {
+    if (this.isComplete()) return
+    const latestGroup = await axios
+      .post('/api/groups/complete', {
+        cartId: this.groupId,
+      })
+      .then((data) => data.data.data)
+
+    this.yomo.send(`change-group-${this.groupId}`, latestGroup)
   }
 }

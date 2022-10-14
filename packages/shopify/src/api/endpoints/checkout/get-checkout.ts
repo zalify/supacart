@@ -14,7 +14,6 @@ const getCheckout: CheckoutEndpoint['handlers']['getCheckout'] = async ({
   const { cookies } = req
   const checkoutUrl = cookies[SHOPIFY_CHECKOUT_URL_COOKIE]
   const customerCookie = cookies[SHOPIFY_CUSTOMER_TOKEN_COOKIE]
-  console.log('customerCookie', customerCookie)
 
   if (customerCookie) {
     try {

@@ -7,11 +7,10 @@ import type { AppProps } from 'next/app'
 import { Head } from '@components/common'
 import { ManagedUIContext } from '@components/ui/context'
 import { GroupManagerProvider } from '@components/GroupManagerProvider'
-import Cookies from 'js-cookie'
+import { GroupManager } from '@lib/GroupManager/client'
 
+GroupManager.initCookie()
 const Noop: FC<{ children?: ReactNode }> = ({ children }) => <>{children}</>
-
-const cartCookie = 'shopify_checkoutId'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const Layout = (Component as any).Layout || Noop
@@ -24,7 +23,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head />
       <style>{`nextjs-portal { display: none}`}</style>
-      <GroupManagerProvider groupId={Cookies.get(cartCookie)}>
+      <GroupManagerProvider>
         <ManagedUIContext>
           <Layout pageProps={pageProps}>
             <Component {...pageProps} />

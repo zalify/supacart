@@ -9,4 +9,4 @@ export type { ShopifyProvider }
 
 export const CommerceProvider = getCommerceProvider(shopifyProvider)
 
-export const useCommerce = () => useCoreCommerce<ShopifyProvider>()
+export const useCommerce = () => useCoreCommerce<ShopifyProvider>() as any

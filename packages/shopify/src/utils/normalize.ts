@@ -136,6 +136,7 @@ export function normalizeCart(checkout: Checkout): Cart {
     customerId: '',
     email: '',
     createdAt: checkout.createdAt,
+    completedAt: checkout.completedAt,
     currency: {
       code: checkout.totalPriceV2?.currencyCode,
     },

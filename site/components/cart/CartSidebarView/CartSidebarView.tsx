@@ -17,6 +17,7 @@ const CartSidebarView: FC = observer(() => {
   const { data, isLoading, isEmpty } = useCart()
   const { gm } = useGroupManager()
   const [doneLoading, setDoneLoading] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
 
   const { price: subTotal } = usePrice(
     data && {
@@ -31,7 +32,11 @@ const CartSidebarView: FC = observer(() => {
     }
   )
   const handleClose = () => closeSidebar()
-  const goToCheckout = () => setSidebarView('CHECKOUT_VIEW')
+  const onCheckout = async () => {
+    setCheckoutLoading(true)
+    await gm?.beginCheckout()
+    setCheckoutLoading(false)
+  }
 
   const onToggleMemberDone = async () => {
     setDoneLoading(true)
@@ -109,7 +114,8 @@ const CartSidebarView: FC = observer(() => {
             <Link href="/cart">
               <a>
                 <Text variant="sectionHeading" onClick={handleClose}>
-                  My Cart
+                  My Cart ({gm?.isInCart() && 'In Cart'}{' '}
+                  {gm?.isCheckout() && 'In Checkout'})
                 </Text>
               </a>
             </Link>
@@ -170,22 +176,59 @@ const CartSidebarView: FC = observer(() => {
               <span>Total</span>
               <span>{total}</span>
             </div>
-            <div>
-              {gm?.isOwner() ? (
+            {gm ? (
+              <div>
+                {gm.isOwner() ? (
+                  gm.isCheckout() ? (
+                    <>
+                      <Button
+                        loading={checkoutLoading}
+                        onClick={onCheckout}
+                        Component="a"
+                        width="100%"
+                      >
+                        Proceed to Checkout
+                      </Button>
+                      <div>----</div>
+                      <Button
+                        onClick={gm.resetToInCart}
+                        Component="a"
+                        width="100%"
+                      >
+                        Proceed to In Cart(Members can add product)
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button onClick={onCheckout} Component="a" width="100%">
+                        Proceed to Checkout
+                      </Button>
+                    </>
+                  )
+                ) : (
+                  <Button
+                    onClick={onToggleMemberDone}
+                    Component="a"
+                    width="100%"
+                    loading={doneLoading}
+                  >
+                    <p>
+                      {gm.isInCart() ? (
+                        <>{gm.isDone() ? 'Not done' : 'Done'}</>
+                      ) : null}
+                    </p>
+                    <p> {gm.isCheckout() && 'await to owner pay'}</p>
+                    <p> {gm.isComplete() && 'owner has payed'}</p>
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div>
                 <Button href="/checkout" Component="a" width="100%">
                   Proceed to Checkout
                 </Button>
-              ) : (
-                <Button
-                  onClick={onToggleMemberDone}
-                  Component="a"
-                  width="100%"
-                  loading={doneLoading}
-                >
-                  {gm?.isDone() ? 'Not done' : 'Done'}
-                </Button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </>
       )}

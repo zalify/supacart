@@ -20,7 +20,7 @@ export const handler: MutationHook<AddItemHook> = {
   },
   async fetcher({ input: item, options, fetch }) {
     const lineItems =
-      item.quantity === 0
+      item.quantity === 0 && !item.variantId
         ? []
         : [
             {

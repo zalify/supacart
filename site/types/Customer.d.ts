@@ -1,5 +1,6 @@
 export interface Group {
   groupId: string
+  status: 'cart' | 'checkout' | 'completed'
   members: Member[]
 }
 

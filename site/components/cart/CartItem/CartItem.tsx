@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  FocusEventHandler,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import cn from 'clsx'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,11 +7,9 @@ import { useUI } from '@components/ui/context'
 import type { LineItem } from '@commerce/types/cart'
 import usePrice from '@framework/product/use-price'
 import useUpdateItem from '@framework/cart/use-update-item'
-import useRemoveItem from '@framework/cart/use-remove-item'
 import Quantity from '@components/ui/Quantity'
 import { useGroupManager } from '@components/GroupManagerProvider'
-import useAddItem from '@framework/cart/use-add-item'
-import { debounce } from 'lodash'
+import { useShopifyCart } from '@lib/hooks/useShopifyCart'
 
 type ItemOption = {
   name: string
@@ -42,12 +33,9 @@ const CartItem = ({
   const { closeSidebarIfPresent } = useUI()
   const [removing, setRemoving] = useState(false)
   const [quantity, setQuantity] = useState<number>(item.quantity)
-  const { gm } = useGroupManager()
-  const addItem = useAddItem()
-  const removeItem = useRemoveItem()
+  const { increaseQuantity, removeItem } = useShopifyCart()
   const updateItem = useUpdateItem({ item })
-  const [updating, setUpdating] = useState(false)
-  const diffRef = useRef(0)
+  const { gm } = useGroupManager()
 
   const { price } = usePrice({
     amount: item.variant.price * item.quantity,
@@ -62,25 +50,15 @@ const CartItem = ({
     await updateItem({ quantity: Number(value) })
   }
 
-  const onCallUpdateItem = useMemo(() => {
-    return debounce(async (n: number) => {
-      diffRef.current = 0
-      try {
-        await addItem({
-          productId: String(item.id),
-          variantId: String(item.variantId),
-          quantity: n,
-        })
-        gm?.updateProduct(n > 0 ? 'add' : 'remove', item.variantId, Math.abs(n))
-      } catch (error) {}
-    }, 500)
-  }, [addItem, gm, item.id, item.variantId])
+  const onIncreaseQuantity = async (n = 1) => {
+    if (!gm?.isInCart()) {
+      alert('Only can update product if in cart status')
+    } else {
+      const val = Number(quantity) + n
+      setQuantity(val)
 
-  const increaseQuantity = async (n = 1) => {
-    const val = Number(quantity) + n
-    diffRef.current += n
-    setQuantity(val)
-    onCallUpdateItem(diffRef.current)
+      await increaseQuantity(item, n)
+    }
   }
 
   const handleRemove = async () => {
@@ -88,10 +66,8 @@ const CartItem = ({
 
     try {
       await removeItem(item)
-      gm?.updateProduct('remove', item.variantId)
-    } catch (error) {
-      setRemoving(false)
-    }
+    } catch (error) {}
+    setRemoving(false)
   }
 
   // TODO: Add a type for this
@@ -179,8 +155,8 @@ const CartItem = ({
           value={quantity}
           handleRemove={handleRemove}
           handleChange={handleChange}
-          increase={() => increaseQuantity(1)}
-          decrease={() => increaseQuantity(-1)}
+          increase={() => onIncreaseQuantity(1)}
+          decrease={() => onIncreaseQuantity(-1)}
         />
       )}
     </li>
