@@ -281,6 +281,8 @@ const GroupDisplay = observer(() => {
     }
     setLoading(true)
     try {
+      console.log('join ', query.g)
+
       const groupData = await GroupManager.joinGroup(query.g as string, email, {
         items: [],
       })
