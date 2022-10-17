@@ -31,23 +31,25 @@ export function useShopifyCart() {
       let { quantity = 1 } = item
       const type = quantity > 0 ? 'add' : 'remove'
       try {
-        await addProductItem(item)
+        const newCarts = await addProductItem(item)
+        cart.mutate(newCarts)
       } catch (error: any) {
         if (
           error
             .toString()
             .includes('Quantity must be greater than or equal to 1')
         ) {
-          await removeProductItem({
+          const newCarts = await removeProductItem({
             id: item.id!,
           })
+          cart.mutate(newCarts)
         }
       }
       if (quantity !== 0) {
         gm?.updateProduct(type, item.variantId, Math.abs(quantity))
       }
     },
-    [addProductItem, cartData, gm, removeProductItem]
+    [addProductItem, cart, cartData, gm, removeProductItem]
   )
 
   const onCallUpdateItem = useMemo(() => {

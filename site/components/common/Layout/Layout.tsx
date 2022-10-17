@@ -29,7 +29,7 @@ import { toJS } from 'mobx'
 import { copy } from '@lib/clipboard'
 import useCart from '@framework/cart/use-cart'
 import { useShopifyCart } from '@lib/hooks/useShopifyCart'
-import { debounce } from 'lodash'
+import { debounce, delay } from 'lodash'
 
 const Loading = () => (
   <div className="w-80 h-80 flex items-center text-center justify-center p-3">
@@ -156,12 +156,18 @@ const Layout: React.FC<Props> = ({
 
 const SyncCarts = observer(() => {
   const { data, isLoading, isEmpty, mutate } = useCart()
-  console.log('complete', data?.completedAt)
 
   const cartData = useRefState(data)
   const { gm } = useGroupManager()
 
-  const cartRefetch = useMemo(() => debounce(mutate, 500), [mutate])
+  const cartRefetch = useMemo(
+    () =>
+      debounce(() => {
+        mutate()
+        delay(mutate, 300)
+      }, 100),
+    [mutate]
+  )
 
   useEffect(() => {
     if (!gm) return
