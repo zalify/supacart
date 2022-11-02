@@ -347,7 +347,7 @@ const GroupDisplay = observer(() => {
     gm?.groupData ? JSON.stringify(gm?.groupData, null, 2) : 'no group data'
   )
 
-  if (gm?.inited !== true) return null
+  // if (gm?.inited !== true) return null
 
   if (gm?.hasGroup() && !gm?.isInCart())
     return (
