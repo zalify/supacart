@@ -373,8 +373,8 @@ const GroupDisplay = observer(() => {
         </Text>
 
         <Text variant="body" className="mt-2 !text-sm">
-          这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js, YoMo.Run
-          研发的面向全球消费者的实时拼单演示项目。
+          这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js Commerce,
+          YoMo.Run 研发的面向全球消费者的实时拼单演示项目。
         </Text>
 
         <div className="mx-3 mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
@@ -405,8 +405,8 @@ const GroupDisplay = observer(() => {
         关于 SupaCart
       </Text>
       <Text variant="body" className="mt-2 !text-sm">
-        这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js, YoMo.Run
-        研发的面向全球消费者的实时拼单演示项目。
+        这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js Commerce,
+        YoMo.Run 研发的面向全球消费者的实时拼单演示项目。
       </Text>
 
       <div className="mx-3 mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">

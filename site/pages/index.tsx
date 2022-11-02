@@ -40,17 +40,27 @@ export default function Home({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <>
-      {/* <Hero
-        headline="Zalify Supacart"
+      <Hero
+        headline="SupaCart by Zalify"
         description={
           <>
-            这是一款由 Zalify
-            团队基于无头电商技术研发的面向全球买家的拼单功能演示项目。
-            <br />
-            规则很简单，你作为团长发起拼单，邀请至少一位同学或同事一起选购DevJoy的周边产品，并由团长最终完成下单即可。
+            <p>
+              这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js
+              Commerce, YoMo.Run 研发的面向全球消费者的实时拼单演示项目。
+            </p>
+            {/* <p>
+              <a
+                className="underline"
+                href="https://github.com/zalify/supacart"
+                rel="noreferrer"
+                target="_blank"
+              >
+                Open Source at GitHub →
+              </a>
+            </p> */}
           </>
         }
-      /> */}
+      />
       <Grid variant="filled">
         {products.slice(0, 3).map((product: any, i: number) => (
           <ProductCard
@@ -64,6 +74,7 @@ export default function Home({
           />
         ))}
       </Grid>
+
       {/* <Marquee variant="secondary">
         {products.slice(0, 3).map((product: any, i: number) => (
           <ProductCard key={product.id} product={product} variant="slim" />
