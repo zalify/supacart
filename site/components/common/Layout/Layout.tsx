@@ -221,6 +221,7 @@ const SyncCarts = observer(() => {
         if (data?.completedAt) {
           // make completed
           await gm.complete()
+          gm.reset()
         } else {
           timer = setTimeout(async () => {
             await cartRefetch()
@@ -339,7 +340,7 @@ const GroupDisplay = observer(() => {
 
   // if (gm?.inited !== true) return null
 
-  if (gm?.hasGroup() && !gm?.isInCart() && !gm?.isComplete())
+  if (gm?.hasGroup() && !gm?.isInCart())
     return (
       <div className="fixed bottom-0 bg-slate-50 z-50 w-full left-0 p-3 border-t border-slate-300">
         <h6 className="text-base font-extrabold">团长正在结账中</h6>

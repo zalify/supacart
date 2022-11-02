@@ -27,9 +27,4 @@
 
 .logo {
   @apply cursor-pointer rounded-full transform duration-100 ease-in-out;
-
-  &:hover {
-    @apply shadow-md;
-    transform: scale(1.05);
-  }
 }
