@@ -212,30 +212,30 @@ const SyncCarts = observer(() => {
   }, [cartRefetch, gm])
 
   // fixme: why we need to poll
-  // const isCheckout = gm?.isCheckout()
-  // useEffect(() => {
-  //   if (!gm) return
-  //   let timer: NodeJS.Timeout
-  //   const loop = async () => {
-  //     if (isCheckout) {
-  //       if (data?.completedAt) {
-  //         // make completed
-  //         await gm.complete()
-  //       } else {
-  //         timer = setTimeout(async () => {
-  //           await cartRefetch()
-  //           loop()
-  //         }, 1000)
-  //       }
-  //     }
-  //   }
-  //   loop()
-  //   return () => {
-  //     if (timer) {
-  //       clearTimeout(timer)
-  //     }
-  //   }
-  // }, [cartRefetch, data, gm, isCheckout])
+  const isCheckout = gm?.isCheckout()
+  useEffect(() => {
+    if (!gm) return
+    let timer: NodeJS.Timeout
+    const loop = async () => {
+      if (isCheckout) {
+        if (data?.completedAt) {
+          // make completed
+          await gm.complete()
+        } else {
+          timer = setTimeout(async () => {
+            await cartRefetch()
+            loop()
+          }, 10000)
+        }
+      }
+    }
+    loop()
+    return () => {
+      if (timer) {
+        clearTimeout(timer)
+      }
+    }
+  }, [cartRefetch, data, gm, isCheckout])
 
   return <></>
 })
