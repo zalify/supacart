@@ -130,7 +130,7 @@ const Layout: React.FC<Props> = ({
 
   return (
     <CommerceProvider locale={locale}>
-      <div className="h-full relative bg-primary mx-auto transition-colors duration-150 max-w-[2460px] pb-20">
+      <div className="h-full relative bg-primary mx-auto transition-colors duration-150 max-w-[2460px] pb-[295px]">
         <Navbar links={navBarlinks} />
         <GroupDisplay />
         <SyncCarts />
