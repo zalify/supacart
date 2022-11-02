@@ -254,7 +254,7 @@ const GroupDisplay = observer(() => {
 
   const onOpen = async () => {
     if (!email) {
-      alert(`email can not be empty`)
+      toast.error('昵称不能为空')
       return
     }
     setLoading(true)
@@ -286,7 +286,7 @@ const GroupDisplay = observer(() => {
   }
   const onJoin = async () => {
     if (!email) {
-      alert(`email can not be empty`)
+      toast.error('昵称不能为空')
       return
     }
     setLoading(true)
@@ -310,20 +310,8 @@ const GroupDisplay = observer(() => {
     const url = location.search.startsWith('?')
       ? location.href + `&g=${encodeURIComponent(gm!.groupId)}`
       : location.href + `?g=${encodeURIComponent(gm!.groupId)}`
-    if (navigator.share) {
-      navigator
-        .share({
-          title: '一起参加DevJoy游园会',
-          url: url,
-        })
-        .then(() => {
-          toast('Thanks for sharing!')
-        })
-        .catch(console.error)
-    } else {
-      copy(url)
-      toast.success('邀请链接已复制！')
-    }
+    copy(url)
+    toast.success('邀请链接已复制！')
   }
 
   const onReset = () => {
