@@ -376,15 +376,15 @@ const GroupDisplay = observer(() => {
     return (
       <div className="fixed bottom-0 bg-slate-50 z-50 w-full left-0 p-3 border-t border-slate-300">
         <h6 className="text-base font-extrabold">
-          {gm.getOwner?.nickname} 邀请你加入「拼单」
+          {gm?.getOwner?.nickname} 邀请你加入「拼单」
         </h6>
         <p className="mt-2 text-sm text-gray-500">
           这是一款由 Zalify
           团队基于无头电商技术研发的面向全球消费者的拼单功能演示项目。
           <br />
-          你将作为成员加入{gm.getOwner?.nickname}的「拼单」
+          你将作为成员加入{gm?.getOwner?.nickname}的「拼单」
           ，一起选购DevJoy的周边产品，完成选购后即可关闭此页面，由团长(
-          {gm.getOwner?.nickname})完成结账。
+          {gm?.getOwner?.nickname})完成结账。
         </p>
         <p>
           <input
