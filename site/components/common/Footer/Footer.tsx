@@ -36,7 +36,6 @@ const Footer: FC<Props> = ({ className, pages }) => {
                 <span className="rounded-full mr-2">
                   <Logo />
                 </span>
-                <span>Zalify</span>
               </a>
             </Link>
           </div>
