@@ -310,7 +310,9 @@ const GroupDisplay = observer(() => {
     const url = location.search.startsWith('?')
       ? location.href + `&g=${encodeURIComponent(gm!.groupId)}`
       : location.href + `?g=${encodeURIComponent(gm!.groupId)}`
-    copy(url)
+    copy(
+      `快来加入 ${gm?.getOwner?.nickname} 一起选购 DevJoy 的周边产品吧！${url}`
+    )
     toast.success('邀请链接已复制！')
   }
 
