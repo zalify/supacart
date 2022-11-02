@@ -342,7 +342,10 @@ const GroupDisplay = observer(() => {
   //     </div>
   //   )
 
-  console.log(gm?.groupData && JSON.stringify(gm?.groupData, null, 2))
+  console.log({ gm })
+  console.log(
+    gm?.groupData ? JSON.stringify(gm?.groupData, null, 2) : 'no group data'
+  )
 
   if (gm?.inited !== true) return null
 
