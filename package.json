@@ -11,9 +11,9 @@
   },
   "devDependencies": {
     "husky": "^8.0.1",
+    "next": "^12.3.0",
     "prettier": "^2.7.1",
-    "turbo": "^1.4.6",
-    "next": "^12.3.0"
+    "turbo": "^1.4.6"
   },
   "husky": {
     "hooks": {

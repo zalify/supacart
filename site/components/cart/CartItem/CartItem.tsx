@@ -91,14 +91,14 @@ const CartItem = ({
       {...rest}
     >
       <div className="flex flex-row space-x-4 py-4">
-        <div className="w-16 h-16 bg-violet relative overflow-hidden cursor-pointer z-0">
+        <div className="w-16 h-16 relative overflow-hidden cursor-pointer z-0">
           <Link href={`/product/${item.path}`}>
             <a>
               <Image
                 onClick={() => closeSidebarIfPresent()}
-                className={s.productImage}
-                width={150}
-                height={150}
+                // className={s.productImage}
+                sizes="4rem"
+                layout="fill"
                 src={item.variant.image?.url || placeholderImg}
                 alt={item.variant.image?.alt || 'Product Image'}
                 unoptimized

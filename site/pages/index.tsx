@@ -40,6 +40,17 @@ export default function Home({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <>
+      {/* <Hero
+        headline="Zalify Supacart"
+        description={
+          <>
+            这是一款由 Zalify
+            团队基于无头电商技术研发的面向全球买家的拼单功能演示项目。
+            <br />
+            规则很简单，你作为团长发起拼单，邀请至少一位同学或同事一起选购DevJoy的周边产品，并由团长最终完成下单即可。
+          </>
+        }
+      /> */}
       <Grid variant="filled">
         {products.slice(0, 3).map((product: any, i: number) => (
           <ProductCard
@@ -53,16 +64,13 @@ export default function Home({
           />
         ))}
       </Grid>
-      <Marquee variant="secondary">
+      {/* <Marquee variant="secondary">
         {products.slice(0, 3).map((product: any, i: number) => (
           <ProductCard key={product.id} product={product} variant="slim" />
         ))}
-      </Marquee>
-      <Hero
-        headline=" Dessert dragée halvah croissant."
-        description="Cupcake ipsum dolor sit amet lemon drops pastry cotton candy. Sweet carrot cake macaroon bonbon croissant fruitcake jujubes macaroon oat cake. Soufflé bonbon caramels jelly beans. Tiramisu sweet roll cheesecake pie carrot cake. "
-      />
-      <Grid layout="B" variant="filled">
+      </Marquee> */}
+
+      {/* <Grid layout="B" variant="filled">
         {products.slice(0, 3).map((product: any, i: number) => (
           <ProductCard
             key={product.id}
@@ -78,7 +86,7 @@ export default function Home({
         {products.slice(3).map((product: any, i: number) => (
           <ProductCard key={product.id} product={product} variant="slim" />
         ))}
-      </Marquee>
+      </Marquee> */}
       {/* <HomeAllProductsGrid
         newestProducts={products}
         categories={categories}

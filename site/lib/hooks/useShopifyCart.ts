@@ -6,6 +6,7 @@ import { debounce } from 'lodash'
 import { useCallback, useMemo, useRef } from 'react'
 import useRemoveItem from '@framework/cart/use-remove-item'
 import { useRefState } from './useRefState'
+import toast from 'react-hot-toast'
 
 export function useShopifyCart() {
   const { gm } = useGroupManager()
@@ -24,7 +25,7 @@ export function useShopifyCart() {
     }) => {
       const isCheckout = !item.quantity && !item.variantId
       if (!cartData || (!gm?.isInCart() && !isCheckout)) {
-        alert('Only can update product if in cart status')
+        toast('必须先发起「拼单」才能选购商品')
         throw new Error('Not in cart')
       }
 

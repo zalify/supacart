@@ -86,10 +86,10 @@ const CartSidebarView: FC = observer(() => {
             <Bag className="absolute" />
           </span>
           <h2 className="pt-6 text-2xl font-bold tracking-wide text-center">
-            Your cart is empty
+            购物车是空的
           </h2>
           <p className="text-accent-3 px-10 text-center pt-2">
-            Biscuit oat cake wafer icing ice cream tiramisu pudding cupcake.
+            邀请好友参与「拼单」吧！
           </p>
         </div>
       ) : error ? (
@@ -114,38 +114,59 @@ const CartSidebarView: FC = observer(() => {
       ) : (
         <>
           <div className="px-4 sm:px-6 flex-1">
-            <Link href="/cart">
-              <a>
-                <Text variant="sectionHeading" onClick={handleClose}>
-                  My Cart ({gm?.isInCart() && 'In Cart'}{' '}
-                  {gm?.isCheckout() && 'In Checkout'})
-                </Text>
-              </a>
-            </Link>
+            {/* <Link href="/cart">
+              <a> */}
+            <Text variant="sectionHeading">
+              购物车 ({gm?.isInCart() && '选购中'}
+              {gm?.isCheckout() && '团长结账中'})
+            </Text>
+            {/* </a>
+            </Link> */}
             <ul className={s.lineItemsList}>
               {membersCartData
                 ? membersCartData?.map((member, index) => {
                     return (
                       <div key={index}>
-                        <h3>
-                          <p>{member.email}</p>
-                          <p>status: {member.done ? 'Done' : 'In progress'}</p>
-                        </h3>
+                        <div className="flex justify-between items-center">
+                          <span className="capitalize">
+                            {member.email}
+                            {member.uuid === gm?.currentMember?.uuid
+                              ? ` (我)`
+                              : null}
+                            {member.role === 'Owner' ? ` - 团长` : ''}
+                          </span>
+                          <span
+                            className={cn(
+                              'text-xs inline-flex items-center rounded px-1 py-0.5 font-medium',
+                              member.done
+                                ? ' bg-emerald-100 text-emerald-800'
+                                : ' bg-orange-100 text-orange-800'
+                            )}
+                          >
+                            {member.done ? '选购完成' : '正在选购'}
+                          </span>
+                        </div>
                         <ul>
-                          {member.products.map((item: any) => {
-                            return (
-                              <CartItem
-                                key={item.id}
-                                item={item}
-                                currencyCode={data!.currency.code}
-                                variant={
-                                  member.uuid === gm?.userId
-                                    ? 'default'
-                                    : 'display'
-                                }
-                              />
-                            )
-                          })}
+                          {member.products.length > 0 ? (
+                            member.products.map((item: any) => {
+                              return (
+                                <CartItem
+                                  key={item.id}
+                                  item={item}
+                                  currencyCode={data!.currency.code}
+                                  variant={
+                                    member.uuid === gm?.userId
+                                      ? 'default'
+                                      : 'display'
+                                  }
+                                />
+                              )
+                            })
+                          ) : (
+                            <p className="text-sm text-slate-900 py-2">
+                              TA的购物车是空的
+                            </p>
+                          )}
                         </ul>
                       </div>
                     )
@@ -161,7 +182,7 @@ const CartSidebarView: FC = observer(() => {
           </div>
 
           <div className="flex-shrink-0 px-6 py-6 sm:px-6 sticky z-20 bottom-0 w-full right-0 left-0 bg-accent-0 border-t text-sm">
-            <ul className="pb-2">
+            {/* <ul className="pb-2">
               <li className="flex justify-between py-1">
                 <span>Subtotal</span>
                 <span>{subTotal}</span>
@@ -174,9 +195,9 @@ const CartSidebarView: FC = observer(() => {
                 <span>Shipping</span>
                 <span className="font-bold tracking-wide">FREE</span>
               </li>
-            </ul>
-            <div className="flex justify-between border-t border-accent-2 py-3 font-bold mb-2">
-              <span>Total</span>
+            </ul> */}
+            <div className="flex justify-between py-3 font-bold mb-2">
+              <span>总计</span>
               <span>{total}</span>
             </div>
             {gm ? (
@@ -190,21 +211,21 @@ const CartSidebarView: FC = observer(() => {
                         Component="a"
                         width="100%"
                       >
-                        Proceed to Checkout
+                        前往支付
                       </Button>
-                      <div>----</div>
+                      {/* <div>----</div>
                       <Button
                         onClick={gm.resetToInCart}
                         Component="a"
                         width="100%"
                       >
                         Proceed to In Cart(Members can add product)
-                      </Button>
+                      </Button> */}
                     </>
                   ) : (
                     <>
                       <Button onClick={onCheckout} Component="a" width="100%">
-                        Proceed to Checkout
+                        前往支付
                       </Button>
                     </>
                   )
@@ -217,7 +238,7 @@ const CartSidebarView: FC = observer(() => {
                         width="100%"
                         loading={doneLoading}
                       >
-                        <>{gm.isDone() ? 'Not done' : 'Done'}</>
+                        <>{gm.isDone() ? '继续选购' : '完成选购'}</>
                       </Button>
                     )}
                     {gm.isCheckout() && (
@@ -227,7 +248,7 @@ const CartSidebarView: FC = observer(() => {
                         width="100%"
                         loading={doneLoading}
                       >
-                        await to owner pay
+                        等待团长完成支付
                       </Button>
                     )}
                     {gm.isComplete() && (
@@ -237,7 +258,7 @@ const CartSidebarView: FC = observer(() => {
                         width="100%"
                         loading={doneLoading}
                       >
-                        owner has payed
+                        团长已完成支付
                       </Button>
                     )}
                   </>

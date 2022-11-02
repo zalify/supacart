@@ -36,6 +36,7 @@ export class GroupManager {
   private events: { [key: string]: ((...args: any[]) => any)[] } = {}
   private lastEventsData: { [key: string]: { time: number; data: any } } = {}
   groupData: Group | null = null
+  inited: boolean = false
 
   constructor(groupId: string) {
     makeAutoObservable(this)
@@ -63,6 +64,7 @@ export class GroupManager {
           })
 
           yomo.send(`connected-${groupId}`, userId)
+          this.inited = true
           resolve(undefined)
         })
       }),
@@ -170,6 +172,10 @@ export class GroupManager {
 
   get currentMember() {
     return this.groupData?.members.find((item) => item.uuid === userId)
+  }
+
+  get getOwner() {
+    return this.groupData?.members.find((item) => item.role === 'Owner')
   }
 
   toggleMemberDone = async () => {

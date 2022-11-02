@@ -120,7 +120,8 @@ const Layout: React.FC<Props> = ({
   children,
   pageProps: { categories = [], ...pageProps },
 }) => {
-  const { acceptedCookies, onAcceptCookies } = useAcceptCookies()
+  // const { acceptedCookies, onAcceptCookies } = useAcceptCookies()
+
   const { locale = 'en-US' } = useRouter()
   const navBarlinks = categories.slice(0, 2).map((c) => ({
     label: c.name,
@@ -129,7 +130,7 @@ const Layout: React.FC<Props> = ({
 
   return (
     <CommerceProvider locale={locale}>
-      <div className={cn(s.root)}>
+      <div className="h-full relative bg-primary mx-auto transition-colors duration-150 max-w-[2460px] pb-20">
         <Navbar links={navBarlinks} />
         <GroupDisplay />
         <SyncCarts />
@@ -139,8 +140,8 @@ const Layout: React.FC<Props> = ({
         <CheckoutProvider>
           <SidebarUI links={navBarlinks} />
         </CheckoutProvider>
-
-        <FeatureBar
+        <Toaster />
+        {/* <FeatureBar
           title="This site uses cookies to improve your experience. By clicking, you agree to our Privacy Policy."
           hide={acceptedCookies}
           action={
@@ -148,7 +149,7 @@ const Layout: React.FC<Props> = ({
               Accept cookies
             </Button>
           }
-        />
+        /> */}
       </div>
     </CommerceProvider>
   )
@@ -210,33 +211,36 @@ const SyncCarts = observer(() => {
     }
   }, [cartRefetch, gm])
 
-  const isCheckout = gm?.isCheckout()
-  useEffect(() => {
-    if (!gm) return
-    let timer: NodeJS.Timeout
-    const loop = async () => {
-      if (isCheckout) {
-        if (data?.completedAt) {
-          // make completed
-          await gm.complete()
-        } else {
-          timer = setTimeout(async () => {
-            await cartRefetch()
-            loop()
-          }, 1000)
-        }
-      }
-    }
-    loop()
-    return () => {
-      if (timer) {
-        clearTimeout(timer)
-      }
-    }
-  }, [cartRefetch, data, gm, isCheckout])
+  // fixme: why we need to poll
+  // const isCheckout = gm?.isCheckout()
+  // useEffect(() => {
+  //   if (!gm) return
+  //   let timer: NodeJS.Timeout
+  //   const loop = async () => {
+  //     if (isCheckout) {
+  //       if (data?.completedAt) {
+  //         // make completed
+  //         await gm.complete()
+  //       } else {
+  //         timer = setTimeout(async () => {
+  //           await cartRefetch()
+  //           loop()
+  //         }, 1000)
+  //       }
+  //     }
+  //   }
+  //   loop()
+  //   return () => {
+  //     if (timer) {
+  //       clearTimeout(timer)
+  //     }
+  //   }
+  // }, [cartRefetch, data, gm, isCheckout])
 
   return <></>
 })
+
+import toast, { Toaster } from 'react-hot-toast'
 
 const GroupDisplay = observer(() => {
   const { gm, setGm } = useGroupManager()
@@ -250,7 +254,7 @@ const GroupDisplay = observer(() => {
 
   const onOpen = async () => {
     if (!email) {
-      alert(`email 不能为空`)
+      alert(`email can not be empty`)
       return
     }
     setLoading(true)
@@ -282,7 +286,7 @@ const GroupDisplay = observer(() => {
   }
   const onJoin = async () => {
     if (!email) {
-      alert(`email 不能为空`)
+      alert(`email can not be empty`)
       return
     }
     setLoading(true)
@@ -303,72 +307,133 @@ const GroupDisplay = observer(() => {
     }
   }
   const onShare = () => {
-    copy(
-      location.search.startsWith('?')
-        ? location.href + `&g=${encodeURIComponent(gm!.groupId)}`
-        : location.href + `?g=${encodeURIComponent(gm!.groupId)}`
-    )
+    const url = location.search.startsWith('?')
+      ? location.href + `&g=${encodeURIComponent(gm!.groupId)}`
+      : location.href + `?g=${encodeURIComponent(gm!.groupId)}`
+    if (navigator.share) {
+      navigator
+        .share({
+          title: '一起参加DevJoy游园会',
+          url: url,
+        })
+        .then(() => {
+          toast('Thanks for sharing!')
+        })
+        .catch(console.error)
+    } else {
+      copy(url)
+      toast.success('邀请链接已复制！')
+    }
   }
 
-  const onRest = () => {
+  const onReset = () => {
     gm?.reset()
   }
 
-  const isSameGroup = gm?.currentMember
+  const isJoined = gm?.currentMember
+
+  // if (gm?.hasGroup() && !gm?.isInCart())
+  //   return (
+  //     <div className="fixed bottom-0 bg-slate-50 z-50 w-full left-0 p-3 border-t border-slate-300">
+  //       <h6 className="text-base font-extrabold">在等待团长支付「拼单」</h6>
+  //       <Button  className="w-full mt-4" onClick={onReset}>
+  //         结束「拼单」并重新发起
+  //       </Button>
+  //     </div>
+  //   )
+
+  console.log(gm?.hasGroup(), gm?.isInCart())
+
+  if (gm?.inited !== true) return null
+
+  if (gm?.hasGroup() && !gm?.isInCart())
+    return (
+      <div className="fixed bottom-0 bg-slate-50 z-50 w-full left-0 p-3 border-t border-slate-300">
+        <h6 className="text-base font-extrabold">团长正在结账中</h6>
+        <p className="mt-2 text-sm text-gray-500">
+          你可以关闭此页面或以团长的身份重新发起「拼单」
+        </p>
+        <Button className="w-full mt-4" onClick={onReset}>
+          重新发起「拼单」
+        </Button>
+      </div>
+    )
+
+  if (gm?.hasGroup() && gm?.isInCart())
+    return (
+      <div className="fixed bottom-0 bg-slate-50 z-50 w-full left-0 p-3 border-t border-slate-300">
+        <h6 className="text-base font-extrabold">「拼单」进行中</h6>
+        <Button className="w-full mt-4" onClick={onShare}>
+          邀请好友参与「拼单」
+        </Button>
+      </div>
+    )
+
+  if (query.g && !isJoined)
+    return (
+      <div className="fixed bottom-0 bg-slate-50 z-50 w-full left-0 p-3 border-t border-slate-300">
+        <h6 className="text-base font-extrabold">
+          {gm.getOwner?.nickname} 邀请你加入「拼单」
+        </h6>
+        <p className="mt-2 text-sm text-gray-500">
+          这是一款由 Zalify
+          团队基于无头电商技术研发的面向全球消费者的拼单功能演示项目。
+          <br />
+          你将作为成员加入{gm.getOwner?.nickname}的「拼单」
+          ，一起选购DevJoy的周边产品，完成选购后即可关闭此页面，由团长(
+          {gm.getOwner?.nickname})完成结账。
+        </p>
+        <p>
+          <input
+            className="form-input w-full mt-4"
+            placeholder="你的昵称"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </p>
+        <Button className="w-full mt-4" onClick={onJoin} loading={loading}>
+          加入
+        </Button>
+      </div>
+    )
 
   return (
-    <div>
-      <p style={{ whiteSpace: 'pre', height: 300, overflowY: 'auto' }}>
+    <div className="fixed bottom-0 bg-slate-50 z-50 w-full left-0 p-3 border-t border-slate-300">
+      {/* <p style={{ whiteSpace: 'pre', height: 100, overflowY: 'auto' }}>
         {gm?.groupData && JSON.stringify(gm?.groupData, null, 2)}
+      </p> */}
+      <h6 className="text-base font-extrabold">发起「拼单」</h6>
+      <p className="mt-2 text-sm text-gray-500">
+        这是一款由 Zalify
+        团队基于无头电商技术研发的面向全球消费者的拼单功能演示项目。
+        <br />
+        规则很简单，你作为团长发起拼单，邀请至少一位同学或同事一起选购DevJoy的周边产品，并由团长最终完成下单即可。
       </p>
-      <p>
-        <Button onClick={onRest}>Reset to new</Button>
-      </p>
-      <div>
-        {gm?.isInCart() && !isSameGroup && (
-          <Button onClick={onJoin} loading={loading}>
-            {'Join group'}
-          </Button>
-        )}
+      {/* <p>
+        <Button onClick={onReset}>Reset to new</Button>
+      </p> */}
+      {/* <div>
+        
         {gm?.isCheckout() && (
           <span style={{ color: 'red', fontSize: 30 }}>group has checkout</span>
         )}
         {gm?.isComplete() && (
           <span style={{ color: 'red', fontSize: 30 }}>group has complete</span>
         )}
-      </div>
-      {query.groupId && !isSameGroup && (
-        <div>
-          <p>
-            <input
-              style={{ border: '1px solid #ccc' }}
-              type="email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </p>
-        </div>
-      )}
+      </div> */}
 
-      {gm?.hasGroup() ? (
-        <div>
-          <Button onClick={onShare}>Share</Button>
-        </div>
-      ) : (
-        <div>
-          <p>
-            <input
-              style={{ border: '1px solid #ccc' }}
-              type="email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </p>
-          {
-            <Button onClick={onOpen} loading={loading}>
-              Open group
-            </Button>
-          }
-        </div>
-      )}
+      <div>
+        <p>
+          <input
+            className="form-input w-full mt-4"
+            placeholder="你的昵称"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </p>
+
+        <Button className="w-full mt-4" onClick={onOpen} loading={loading}>
+          发起
+        </Button>
+      </div>
     </div>
   )
 })

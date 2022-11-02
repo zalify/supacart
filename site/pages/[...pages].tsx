@@ -70,9 +70,7 @@ export async function getStaticPaths({ locales }: GetStaticPathsContext) {
   }
 }
 
-export default function Pages({
-  page,
-}: {page: Page}) {
+export default function Pages({ page }: { page: Page }) {
   const router = useRouter()
 
   return router.isFallback ? (

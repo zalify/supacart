@@ -6,7 +6,7 @@ import Link from 'next/link'
 interface HeroProps {
   className?: string
   headline: string
-  description: string
+  description: React.ReactNode
 }
 
 const Hero: FC<HeroProps> = ({ headline, description }) => {
@@ -17,12 +17,12 @@ const Hero: FC<HeroProps> = ({ headline, description }) => {
           <h2 className={s.title}>{headline}</h2>
           <div className={s.description}>
             <p>{description}</p>
-            <Link href="/">
+            {/* <Link href="/">
               <a className="flex items-center text-accent-0 pt-3 font-bold hover:underline cursor-pointer w-max-content">
-                Read it here
+                发起拼单
                 <ArrowRight width="20" heigh="20" className="ml-1" />
               </a>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </Container>
