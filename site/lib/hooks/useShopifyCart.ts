@@ -8,6 +8,7 @@ import useRemoveItem from '@framework/cart/use-remove-item'
 import { useRefState } from './useRefState'
 import toast from 'react-hot-toast'
 
+let isChange = false
 export function useShopifyCart() {
   const { gm } = useGroupManager()
   const cart = useCart()
@@ -23,12 +24,13 @@ export function useShopifyCart() {
       quantity?: number
       id?: string
     }) => {
+      if (isChange) return
+      isChange = true
       const isCheckout = !item.quantity && !item.variantId
       if (!cartData || (!gm?.isInCart() && !isCheckout)) {
         toast('必须先发起「拼单」才能选购商品')
         throw new Error('Not in cart')
       }
-
       let { quantity = 1 } = item
       const type = quantity > 0 ? 'add' : 'remove'
       try {
@@ -47,14 +49,15 @@ export function useShopifyCart() {
         }
       }
       if (quantity !== 0) {
-        gm?.updateProduct(type, item.variantId, Math.abs(quantity))
+        await gm?.updateProduct(type, item.variantId, Math.abs(quantity))
       }
+      isChange = false
     },
     [addProductItem, cart, cartData, gm, removeProductItem]
   )
 
   const onCallUpdateItem = useMemo(() => {
-    return debounce(async (item: LineItem, n: number) => {
+    return async (item: LineItem, n: number) => {
       diffRef.current = 0
       return addItem({
         id: item.id,
@@ -62,7 +65,7 @@ export function useShopifyCart() {
         variantId: String(item.variantId),
         quantity: n,
       })
-    }, 500)
+    }
   }, [addItem])
 
   const increaseQuantity = async (item: LineItem, n = 1) => {

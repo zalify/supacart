@@ -36,6 +36,7 @@ const CartItem = ({
   const { increaseQuantity, removeItem } = useShopifyCart()
   const updateItem = useUpdateItem({ item })
   const { gm } = useGroupManager()
+  const [loading, setLoading] = useState(false)
 
   const { price } = usePrice({
     amount: item.variant.price * item.quantity,
@@ -54,10 +55,16 @@ const CartItem = ({
     if (!gm?.isInCart()) {
       alert('Only can update product if in cart status')
     } else {
-      const val = Number(quantity) + n
-      setQuantity(val)
+      setLoading(true)
+      try {
+        const val = Number(quantity) + n
+        setQuantity(val)
 
-      await increaseQuantity(item, n)
+        await increaseQuantity(item, n)
+      } catch (error) {
+        setQuantity(quantity)
+      }
+      setLoading(false)
     }
   }
 
@@ -153,6 +160,7 @@ const CartItem = ({
       {variant === 'default' && (
         <Quantity
           value={quantity}
+          disabled={loading}
           handleRemove={handleRemove}
           handleChange={handleChange}
           increase={() => onIncreaseQuantity(1)}

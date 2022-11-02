@@ -12,7 +12,7 @@ export const GroupManagerProvider: React.FC<{
 }> = (props) => {
   const { query } = useRouter()
 
-  const groupId = (query.g as string) || GroupManager.getGroupId()
+  const groupId = GroupManager.getGroupId() || (query.g as string) // 现在不允许加入其它团
   const [gm, setGm] = useState<GroupManager | null>(null)
 
   useEffect(() => {
