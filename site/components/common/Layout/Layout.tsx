@@ -342,7 +342,7 @@ const GroupDisplay = observer(() => {
   //     </div>
   //   )
 
-  console.log(gm?.hasGroup(), gm?.isInCart())
+  console.log(gm?.groupData && JSON.stringify(gm?.groupData, null, 2))
 
   if (gm?.inited !== true) return null
 
