@@ -28,7 +28,7 @@ export function useShopifyCart() {
       isChange = true
       const isCheckout = !item.quantity && !item.variantId
       if (!cartData || (!gm?.isInCart() && !isCheckout)) {
-        toast('必须先发起「拼单」才能选购商品')
+        toast('「拼单进行中」的时候才能选购商品', { position: 'bottom-center' })
         throw new Error('Not in cart')
       }
       let { quantity = 1 } = item

@@ -262,7 +262,7 @@ const GroupDisplay = observer(() => {
 
   const onOpen = async () => {
     if (!email) {
-      toast.error('昵称不能为空')
+      toast.error('昵称不能为空', { position: 'bottom-center' })
       return
     }
     setLoading(true)
@@ -294,7 +294,7 @@ const GroupDisplay = observer(() => {
   }
   const onJoin = async () => {
     if (!email) {
-      toast.error('昵称不能为空')
+      toast.error('昵称不能为空', { position: 'bottom-center' })
       return
     }
     setLoading(true)
@@ -326,7 +326,7 @@ const GroupDisplay = observer(() => {
           url: url,
         })
         .then(() => {
-          toast.success('邀请链接已复制！')
+          toast.success('邀请链接已复制！', { position: 'bottom-center' })
         })
         .catch(console.error)
     } else {
