@@ -13,7 +13,6 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@bigheads/core": "^0.3.3",
     "@radix-ui/react-dropdown-menu": "^1.0.0",
     "@react-spring/web": "^9.4.1",
     "@types/lodash": "^4.14.186",

@@ -244,12 +244,6 @@ const SyncCarts = observer(() => {
 import toast, { Toaster } from 'react-hot-toast'
 import { Text } from '@components/ui'
 
-// @ts-ignore
-const BigHeadComponent = dynamic(
-  () => import('@bigheads/core').then((mod) => mod.BigHead),
-  { ssr: false }
-)
-
 const GroupDisplay = observer(() => {
   const { gm, setGm } = useGroupManager()
   const { data, mutate } = useCart()
@@ -374,17 +368,21 @@ const GroupDisplay = observer(() => {
       <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
         <Text variant="cardHeading">「拼单」进行中</Text>
         <div className="flex space-x-1">
+          <div>成员：</div>
           {gm.groupData?.members.map((m) => (
             <div key={m.uuid} className="flex flex-col items-center">
-              <div className="w-10 h-10">
+              {/* <div className="w-10 h-10">
                 <BigHeadComponent
                   clothing="shirt"
                   graphic="none"
                   facialHair="none"
                   skinTone="yellow"
                 />
+              </div> */}
+              <div className="text-secondary capitalize rounded-full bg-secondary text-sm px-2 py-0.5">
+                {m.nickname}
+                {m.role === 'Owner' ? ' - 团长' : ''}
               </div>
-              <div className="text-xs capitalize">{m.nickname}</div>
             </div>
           ))}
         </div>
