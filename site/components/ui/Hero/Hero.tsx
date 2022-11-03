@@ -16,7 +16,7 @@ const Hero: FC<HeroProps> = ({ headline, description }) => {
         <div className={s.root}>
           <h2 className={s.title}>{headline}</h2>
           <div className={s.description}>
-            <p>{description}</p>
+            <div>{description}</div>
             {/* <Link href="/">
               <a className="flex items-center text-accent-0 pt-3 font-bold hover:underline cursor-pointer w-max-content">
                 发起拼单

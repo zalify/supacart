@@ -106,6 +106,7 @@ const CartItem = ({
                 // className={s.productImage}
                 sizes="4rem"
                 layout="fill"
+                objectFit="cover"
                 src={item.variant.image?.url || placeholderImg}
                 alt={item.variant.image?.alt || 'Product Image'}
                 unoptimized

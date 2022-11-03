@@ -44,10 +44,10 @@ export default function Home({
         headline="SupaCart by Zalify"
         description={
           <>
-            <p>
+            <div>
               这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js
               Commerce, YoMo.Run 研发的面向全球消费者的实时拼单演示项目。
-            </p>
+            </div>
             {/* <p>
               <a
                 className="underline"

@@ -248,12 +248,12 @@ const GroupDisplay = observer(() => {
   const { gm, setGm } = useGroupManager()
   const { data, mutate } = useCart()
   const cartRefetch = useRefState(mutate)
-  const { query } = useRouter()
+  const router = useRouter()
   const { addProductItem } = useShopifyCart()
   const [email, setEmail] = useState('')
   const cookie = getCartCookie()!
   const [loading, setLoading] = useState(false)
-
+  const { query } = router
   const onOpen = async () => {
     if (!email) {
       toast.error('昵称不能为空', { position: 'bottom-center' })
@@ -335,91 +335,179 @@ const GroupDisplay = observer(() => {
     gm?.reset()
   }
 
+  const onGoOldGroup = () => {
+    router.replace({
+      query: {
+        g: gm!.groupId,
+      },
+    })
+  }
+
+  const onGoNewGroup = async () => {
+    const newGid = typeof query.g === 'string' ? query.g : null
+    const currentMember = gm?.groupData?.members.find(
+      (m) => m.uuid === gm.userId
+    )
+    const currentName = currentMember ? currentMember.nickname : null
+
+    if (newGid) {
+      // gm?.reset()
+      if (currentName) {
+        // join new group with current Name
+        setLoading(true)
+
+        try {
+          console.log('join ', newGid, currentName)
+
+          const groupData = await GroupManager.joinGroup(
+            newGid as string,
+            currentName,
+            {
+              items: [],
+            }
+          )
+
+          await cartRefetch.current()
+          const gm = new GroupManager(groupData.id)
+          gm.send(`change-group-${gm.groupId}`, groupData)
+          setGm(gm)
+          console.log('joined , ', gm.groupId)
+        } catch (error) {
+        } finally {
+          setLoading(false)
+        }
+      }
+
+      router.replace({
+        query: {
+          g: newGid,
+        },
+      })
+    }
+  }
+
   const isJoined = gm?.currentMember
 
   // if (gm?.hasGroup() && !gm?.isInCart())
   //   return (
-  //     <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-  //       <Text className=""> </Text>在等待团长支付「拼单」</h6>
-  //       <Button  className="w-full mt-4" onClick={onReset}>
-  //         结束「拼单」并重新发起
-  //       </Button>
-  //     </div>
+  // <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
+  //   <Text className=""> </Text>在等待团长支付「拼单」</h6>
+  //   <Button  className="w-full mt-4" onClick={onReset}>
+  //     结束「拼单」并重新发起
+  //   </Button>
+  // </div>
   //   )
 
   // if (gm?.inited !== true) return null
 
-  if (gm?.hasGroup() && !gm?.isInCart())
+  if (query.g && gm?.groupId && query.g !== gm.groupId) {
     return (
-      <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-        <Text variant="cardHeading">团长正在结账中</Text>
-        <Text variant="body" className="mt-2 !text-sm">
-          你可以关闭此页面或以团长的身份重新发起「拼单」
-        </Text>
+      <div className="fixed inset-0 backdrop-blur-sm bg-black/40 text-primary z-50 p-3">
+        <div className="flex items-center justify-center h-full">
+          <div className="w-[250px] bg-primary text-primary p-4 border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
+            <Text variant="cardHeading">
+              你当前和 {gm.getOwner?.nickname}{' '}
+              的拼单还在进行中，看上去又点击了一个新的拼单链接
+            </Text>
 
-        <Button className="w-full mt-4" onClick={onReset}>
-          重新发起「拼单」
-        </Button>
-      </div>
-    )
-
-  if (gm?.hasGroup() && gm?.isInCart())
-    return (
-      <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-        <Text variant="cardHeading">「拼单」进行中</Text>
-        <div className="flex space-x-1">
-          <div>成员：</div>
-          {gm.groupData?.members.map((m) => (
-            <div key={m.uuid} className="flex flex-col items-center">
-              {/* <div className="w-10 h-10">
-                <BigHeadComponent
-                  clothing="shirt"
-                  graphic="none"
-                  facialHair="none"
-                  skinTone="yellow"
-                />
-              </div> */}
-              <div className="text-secondary capitalize rounded-full bg-secondary text-sm px-2 py-0.5">
-                {m.nickname}
-                {m.role === 'Owner' ? ' - 团长' : ''}
-              </div>
-            </div>
-          ))}
+            <Button
+              variant="slim"
+              className="w-full mt-4"
+              onClick={onGoOldGroup}
+            >
+              回到 {gm.getOwner?.nickname} 的拼单
+            </Button>
+            <Text variant="body" className="mt-4 !text-sm text-center">
+              或者
+            </Text>
+            <Button
+              variant="slim"
+              className="w-full mt-4"
+              onClick={onGoNewGroup}
+            >
+              加入新的拼单
+            </Button>
+          </div>
         </div>
-        <Button className="w-full mt-4" onClick={onShare}>
-          邀请更多好友参与「拼单」
-        </Button>
       </div>
     )
+  }
+
+  if (gm?.hasGroup()) {
+    if (gm?.isCheckout()) {
+      return (
+        <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
+          <Text variant="cardHeading">团长正在结账中</Text>
+          <Text variant="body" className="mt-2 !text-sm">
+            你可以关闭此页面或以团长的身份重新发起「拼单」
+          </Text>
+
+          <Button className="w-full mt-4" onClick={onReset}>
+            重新发起「拼单」
+          </Button>
+        </div>
+      )
+    } else if (gm?.isInCart()) {
+      return (
+        <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
+          <Text variant="cardHeading">「拼单」进行中</Text>
+          <div className="flex space-x-1">
+            <div>成员：</div>
+            {gm.groupData?.members.map((m) => (
+              <div key={m.uuid} className="flex flex-col items-center">
+                <div className="text-secondary capitalize rounded-full bg-secondary text-sm px-2 py-0.5">
+                  {m.nickname}
+                  {m.role === 'Owner' ? ' - 团长' : ''}
+                </div>
+              </div>
+            ))}
+          </div>
+          <Button className="w-full mt-4" onClick={onShare}>
+            邀请更多好友参与「拼单」
+          </Button>
+        </div>
+      )
+    } else {
+      return (
+        <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
+          <Button className="w-full mt-4" onClick={onReset}>
+            重置
+          </Button>
+        </div>
+      )
+    }
+  }
 
   if (query.g && !isJoined)
     return (
       <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-        <Text variant="cardHeading">
-          {gm?.getOwner?.nickname} 邀请你加入「拼单」
-        </Text>
-
-        <Text variant="body" className="mt-2 !text-sm">
-          这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js Commerce,
-          YoMo.Run 研发的面向全球消费者的实时拼单演示项目。
-        </Text>
-
-        <div className="mx-3 mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
-          你将作为成员加入{gm?.getOwner?.nickname}的「拼单」
-          ，一起选购DevJoy的周边产品，完成选购后即可关闭此页面，由团长
-          {gm?.getOwner?.nickname} 完成结账。
+        <div className="flex items-center justify-between mb-4">
+          <Text variant="cardHeading" className="!mb-0">
+            {gm?.getOwner?.nickname} 邀请你加入「拼单」
+          </Text>
+          <Button variant="slim" onClick={onReset} loading={loading}>
+            自己逛逛
+          </Button>
         </div>
 
-        <p>
+        <div className="mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
+          你将作为成员加入{gm?.getOwner?.nickname}的「拼单」一起选购 DevJoy
+          的周边产品，完成选购后即可关闭此页面，由团长 {gm?.getOwner?.nickname}{' '}
+          完成结账。
+        </div>
+
+        <div>
           <input
             className="form-input w-full mt-4"
             placeholder="你的昵称"
             onChange={(e) => setEmail(e.target.value)}
           />
-        </p>
-        <Button className="w-full mt-4" onClick={onJoin} loading={loading}>
-          加入
-        </Button>
+        </div>
+        <div className="mt-4 flex space-x-4">
+          <Button className="w-full" onClick={onJoin} loading={loading}>
+            加入
+          </Button>
+        </div>
       </div>
     )
 
@@ -429,14 +517,10 @@ const GroupDisplay = observer(() => {
         {gm?.groupData && JSON.stringify(gm?.groupData, null, 2)}
       </p> */}
       <Text variant="cardHeading" className="">
-        关于 SupaCart
-      </Text>
-      <Text variant="body" className="mt-2 !text-sm">
-        这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js Commerce,
-        YoMo.Run 研发的面向全球消费者的实时拼单演示项目。
+        发起「拼单」
       </Text>
 
-      <div className="mx-3 mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
+      <div className="mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
         你作为团长发起拼单，邀请至少一位朋友👬一起选购 DevJoy
         的周边产品，最终由团长独自完成下单即可。
       </div>
@@ -455,13 +539,13 @@ const GroupDisplay = observer(() => {
       </div> */}
 
       <div>
-        <p>
+        <div>
           <input
             className="form-input w-full mt-4"
             placeholder="你的昵称"
             onChange={(e) => setEmail(e.target.value)}
           />
-        </p>
+        </div>
 
         <div className="flex space-x-4">
           <Button
