@@ -89,7 +89,7 @@ const CartSidebarView: FC = observer(() => {
             购物车是空的
           </h2>
           <p className="text-accent-3 px-10 text-center pt-2">
-            邀请好友参与「拼单」吧！
+            邀请更多好友参与「拼单」吧！
           </p>
         </div>
       ) : error ? (
@@ -126,7 +126,7 @@ const CartSidebarView: FC = observer(() => {
               {membersCartData
                 ? membersCartData?.map((member, index) => {
                     return (
-                      <div key={index}>
+                      <div key={index} className="py-4">
                         <div className="flex justify-between items-center">
                           <span className="capitalize">
                             {member.email}

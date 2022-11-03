@@ -632,6 +632,7 @@ importers:
 
   site:
     specifiers:
+      '@bigheads/core': ^0.3.3
       '@next/bundle-analyzer': ^12.0.8
       '@radix-ui/react-dropdown-menu': ^1.0.0
       '@react-spring/web': ^9.4.1
@@ -693,6 +694,7 @@ importers:
       tailwindcss: ^3.0.13
       typescript: 4.7.4
     dependencies:
+      '@bigheads/core': 0.3.3_react@18.2.0
       '@radix-ui/react-dropdown-menu': 1.0.0_7ey2zzynotv32rpkwno45fsx4e
       '@react-spring/web': 9.5.4_biqbaboplfbrettd7655fr4n2y
       '@types/lodash': 4.14.186
@@ -1370,6 +1372,15 @@ packages:
       '@babel/helper-validator-identifier': 7.18.6
       to-fast-properties: 2.0.0
     dev: true
+
+  /@bigheads/core/0.3.3_react@18.2.0:
+    resolution: {integrity: sha512-lu+TbgFR3IRPQR539td47935SwujzT4OQJdqReksVPJ9f3Tn80kpemIsdmO4yYm9FWW7eAGV+a5bFKC4/1jpLA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /@chec/commerce.js/2.8.0:
     resolution: {integrity: sha512-OPBphT/hU33iDp52zzYOqz/oSXLhEuhGVUg2UNvYtmBW4eCNmtsM0dqW0+wu+6K0d6fZojurCBdVQMKb2R7l3g==}

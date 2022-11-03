@@ -243,6 +243,7 @@ const SyncCarts = observer(() => {
 
 import toast, { Toaster } from 'react-hot-toast'
 import { Text } from '@components/ui'
+import { BigHead } from '@bigheads/core'
 
 const GroupDisplay = observer(() => {
   const { gm, setGm } = useGroupManager()
@@ -312,10 +313,23 @@ const GroupDisplay = observer(() => {
     const url = location.search.startsWith('?')
       ? location.href + `&g=${encodeURIComponent(gm!.groupId)}`
       : location.href + `?g=${encodeURIComponent(gm!.groupId)}`
-    copy(
-      `快来加入 ${gm?.getOwner?.nickname} 一起选购 DevJoy 的周边产品吧！${url}`
-    )
-    toast.success('邀请链接已复制！')
+
+    if ('share' in navigator) {
+      navigator
+        .share({
+          title: `快来加入 ${gm?.getOwner?.nickname} 一起选购 DevJoy 的周边产品吧！`,
+          url: url,
+        })
+        .then(() => {
+          toast.success('邀请链接已复制！')
+        })
+        .catch(console.error)
+    } else {
+      copy(
+        `快来加入 ${gm?.getOwner?.nickname} 一起选购 DevJoy 的周边产品吧！${url}`
+      )
+      toast.success('邀请链接已复制！', { position: 'bottom-center' })
+    }
   }
 
   const onReset = () => {
@@ -359,8 +373,23 @@ const GroupDisplay = observer(() => {
     return (
       <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
         <Text variant="cardHeading">「拼单」进行中</Text>
+        <div className="flex space-x-1">
+          {gm.groupData?.members.map((m) => (
+            <div key={m.uuid} className="flex flex-col items-center">
+              <div className="w-10 h-10">
+                <BigHead
+                  clothing="shirt"
+                  graphic="none"
+                  facialHair="none"
+                  skinTone="yellow"
+                />
+              </div>
+              <div className="text-xs capitalize">{m.nickname}</div>
+            </div>
+          ))}
+        </div>
         <Button className="w-full mt-4" onClick={onShare}>
-          邀请好友参与「拼单」
+          邀请更多好友参与「拼单」
         </Button>
       </div>
     )
@@ -436,9 +465,19 @@ const GroupDisplay = observer(() => {
           />
         </p>
 
-        <Button className="w-full mt-4" onClick={onOpen} loading={loading}>
-          发起「拼单」
-        </Button>
+        <div className="flex space-x-4">
+          <Button
+            variant="ghost"
+            className="w-full mt-4"
+            onClick={onOpen}
+            loading={loading}
+          >
+            先独自逛逛
+          </Button>
+          <Button className="w-full mt-4" onClick={onOpen} loading={loading}>
+            发起「拼单」
+          </Button>
+        </div>
       </div>
     </div>
   )
