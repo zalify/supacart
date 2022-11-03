@@ -46,14 +46,14 @@ const ProductCard: FC<Props> = ({
               <span>{product.name}</span>
             </div>
             {product?.images && (
-              <div>
+              <div className="w-[320px] h-[320px]">
                 <Image
                   quality="85"
                   src={product.images[0]?.url || placeholderImg}
                   alt={product.name || 'Product Image'}
-                  height={320}
-                  width={320}
-                  layout="fixed"
+                  sizes="320px"
+                  layout="fill"
+                  objectFit="cover"
                   {...imgProps}
                 />
               </div>

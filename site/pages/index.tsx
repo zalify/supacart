@@ -12,7 +12,7 @@ export async function getStaticProps({
 }: GetStaticPropsContext) {
   const config = { locale, locales }
   const productsPromise = commerce.getAllProducts({
-    variables: { first: 6 },
+    variables: { first: 8 },
     config,
     preview,
     // Saleor provider only
@@ -75,14 +75,14 @@ export default function Home({
         ))}
       </Grid>
 
-      {/* <Marquee variant="secondary">
-        {products.slice(0, 3).map((product: any, i: number) => (
+      <Marquee variant="secondary">
+        {products.slice(3, 7).map((product: any, i: number) => (
           <ProductCard key={product.id} product={product} variant="slim" />
         ))}
-      </Marquee> */}
+      </Marquee>
 
       {/* <Grid layout="B" variant="filled">
-        {products.slice(0, 3).map((product: any, i: number) => (
+        {products.slice(3, 7).map((product: any, i: number) => (
           <ProductCard
             key={product.id}
             product={product}
@@ -92,8 +92,8 @@ export default function Home({
             }}
           />
         ))}
-      </Grid>
-      <Marquee>
+      </Grid> */}
+      {/* <Marquee>
         {products.slice(3).map((product: any, i: number) => (
           <ProductCard key={product.id} product={product} variant="slim" />
         ))}
