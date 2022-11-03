@@ -243,11 +243,10 @@ const SyncCarts = observer(() => {
 
 import toast, { Toaster } from 'react-hot-toast'
 import { Text } from '@components/ui'
-const BigHead = dynamic(
-  () => import('@bigheads/core').then((lib) => lib.BigHead),
-  {
-    ...dynamicProps,
-  }
+
+const BigHeadComponent = dynamic(
+  () => import('@bigheads/core').then((mod) => mod.BigHead),
+  { ssr: false }
 )
 
 const GroupDisplay = observer(() => {
@@ -377,7 +376,7 @@ const GroupDisplay = observer(() => {
           {gm.groupData?.members.map((m) => (
             <div key={m.uuid} className="flex flex-col items-center">
               <div className="w-10 h-10">
-                <BigHead
+                <BigHeadComponent
                   clothing="shirt"
                   graphic="none"
                   facialHair="none"
