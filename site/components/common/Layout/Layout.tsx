@@ -243,7 +243,12 @@ const SyncCarts = observer(() => {
 
 import toast, { Toaster } from 'react-hot-toast'
 import { Text } from '@components/ui'
-import { BigHead } from '@bigheads/core'
+const BigHead = dynamic(
+  () => import('@bigheads/core').then((lib) => lib.BigHead),
+  {
+    ...dynamicProps,
+  }
+)
 
 const GroupDisplay = observer(() => {
   const { gm, setGm } = useGroupManager()
@@ -347,11 +352,6 @@ const GroupDisplay = observer(() => {
   //       </Button>
   //     </div>
   //   )
-
-  console.log({ gm })
-  console.log(
-    gm?.groupData ? JSON.stringify(gm?.groupData, null, 2) : 'no group data'
-  )
 
   // if (gm?.inited !== true) return null
 
