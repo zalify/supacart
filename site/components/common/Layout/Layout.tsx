@@ -244,6 +244,7 @@ const SyncCarts = observer(() => {
 import toast, { Toaster } from 'react-hot-toast'
 import { Text } from '@components/ui'
 
+// @ts-ignore
 const BigHeadComponent = dynamic(
   () => import('@bigheads/core').then((mod) => mod.BigHead),
   { ssr: false }
