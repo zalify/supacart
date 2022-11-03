@@ -1,25 +1,25 @@
 {
-  "title": "ACME Storefront | Powered by Next.js Commerce",
-  "titleTemplate": "%s - ACME Storefront",
-  "description": "Next.js Commerce - https://www.nextjs.org/commerce",
+  "title": "SupaCart by Zalify | Realtime co-shopping eCommerce",
+  "titleTemplate": "%s - SupaCart by Zalify",
+  "description": "Zalify - https://www.zalify.com",
   "openGraph": {
-    "title": "ACME Storefront | Powered by Next.js Commerce",
-    "description": "Next.js Commerce - https://www.nextjs.org/commerce",
+    "title": "SupaCart by Zalify | Powered by Next.js Commerce",
+    "description": "SupaCart by Zalify - https://www.zalify.com",
     "type": "website",
-    "url": "https://nextjs.org/commerce",
-    "site_name": "Next.js Commerce",
+    "url": "https://www.zalify.com",
+    "site_name": "SupaCart by Zalify",
     "images": [
       {
         "url": "/card.png",
         "width": "800",
         "height": "600",
-        "alt": "Next.js Commerce"
+        "alt": "SupaCart by Zalify | Realtime co-shopping eCommerce"
       }
     ]
   },
   "twitter": {
-    "handle": "@nextjs",
-    "site": "@nextjs",
+    "handle": "@zalifyapp",
+    "site": "@zalifyapp",
     "cardType": "summary_large_image"
   }
 }
