@@ -2,7 +2,7 @@
 
 .env
 
-...
+..
 
 ### development
 
