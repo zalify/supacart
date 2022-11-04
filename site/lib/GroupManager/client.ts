@@ -2,15 +2,15 @@ import { Group, Member } from 'types/Customer'
 
 import Presence from '@yomo/presencejs'
 import { nanoid } from 'nanoid'
-import { isEqual } from 'lodash'
+import { flatMap, isEqual, sum } from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { getCartCookie } from '@lib/getCartCookie'
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, toJS } from 'mobx'
 import {
   SHOPIFY_CHECKOUT_ID_COOKIE,
   SHOPIFY_CHECKOUT_URL_COOKIE,
 } from '@framework/const'
+import { store } from '@lib/store'
 
 const USER_SESSION_ID = 'USER_SESSION_ID'
 const GROUPId_KEY = 'GROUPId_KEY'
@@ -82,6 +82,47 @@ export class GroupManager {
 
   isDone = () => {
     return Boolean(this.currentMember?.done)
+  }
+
+  get products() {
+    if (!this.groupData) return []
+    return flatMap(this.groupData?.members.map((item) => item.products.items))
+  }
+
+  getVariants() {
+    const variants: Record<string, number> = {}
+    this.products.forEach((item) => {
+      if (!variants[item.variantId]) {
+        variants[item.variantId] = 0
+      }
+
+      variants[item.variantId] += item.quantity
+    })
+    return variants
+  }
+
+  get productItemCount() {
+    return sum(this.products.map((item) => item.quantity))
+  }
+
+  get isCartEmpty() {
+    return this.products.length === 0
+  }
+
+  get totalPrice() {
+    return sum(
+      this.products.map((item) => {
+        const matchProduct = store.state.products.find((product) =>
+          product.variants.find((variant) => variant.id === item.variantId)
+        )
+        const matchVariant = matchProduct?.variants.find(
+          (variant) => variant.id === item.variantId
+        )
+        if (!matchVariant || !matchVariant.price) return 0
+
+        return (matchVariant as any).price * item.quantity
+      })
+    )
   }
 
   async fetchData() {
@@ -312,10 +353,6 @@ export class GroupManager {
       .then((data) => data.data.data)) as Group
 
     this.yomo.send(`change-group-${this.groupId}`, latestGroup)
-
-    setTimeout(() => {
-      window.location.assign('/checkout')
-    }, 100)
   }
 
   resetToInCart = async () => {

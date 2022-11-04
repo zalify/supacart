@@ -42,7 +42,7 @@ export const handler = {
       if (item.quantity! < 1) {
         return removeItemHandler.fetcher({
           options: removeItemHandler.fetchOptions,
-          input: { itemId },
+          input: [itemId],
           fetch,
         })
       }

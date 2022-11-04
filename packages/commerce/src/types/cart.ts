@@ -210,7 +210,7 @@ export type GetCartHook = {
 export type AddItemHook = {
   data: Cart
   input?: CartItemBody
-  fetcherInput: CartItemBody
+  fetcherInput: CartItemBody | Array<CartItemBody>
   body: { item: CartItemBody }
   actionInput: CartItemBody
 }
@@ -226,9 +226,9 @@ export type UpdateItemHook = {
 export type RemoveItemHook = {
   data: Cart | null | undefined
   input: { item?: LineItem }
-  fetcherInput: { itemId: string }
+  fetcherInput: Array<string>
   body: { itemId: string }
-  actionInput: { id: string }
+  actionInput: { id: string } | Array<{ id: string }>
 }
 
 /**

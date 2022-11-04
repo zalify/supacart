@@ -7,6 +7,8 @@ import { useRouter } from 'next/router'
 import commerce from '@lib/api/commerce'
 import { Layout } from '@components/common'
 import { ProductView } from '@components/product'
+import { useEffect } from 'react'
+import { store } from '@lib/store'
 
 export async function getStaticProps({
   params,
@@ -22,8 +24,14 @@ export async function getStaticProps({
     config,
     preview,
   })
-
   const allProductsPromise = commerce.getAllProducts({
+    variables: { first: 250 },
+    config,
+    preview,
+  })
+  const { products: allProducts } = await allProductsPromise
+
+  const displayProductsPromise = commerce.getAllProducts({
     variables: { first: 4 },
     config,
     preview,
@@ -32,7 +40,7 @@ export async function getStaticProps({
   const { pages } = await pagesPromise
   const { categories } = await siteInfoPromise
   const { product } = await productPromise
-  const { products: relatedProducts } = await allProductsPromise
+  const { products: relatedProducts } = await displayProductsPromise
 
   if (!product) {
     throw new Error(`Product with slug '${params!.slug}' not found`)
@@ -42,6 +50,7 @@ export async function getStaticProps({
     props: {
       pages,
       product,
+      allProducts,
       relatedProducts,
       categories,
     },

@@ -22,7 +22,7 @@ export type RemoveItemActionInput<T = any> = T extends LineItem
   ? Partial<RemoveItemHook['actionInput']>
   : RemoveItemHook['actionInput']
 
-export default useRemoveItem as UseRemoveItem<typeof handler>
+export default useRemoveItem as UseRemoveItem<any>
 
 import {
   checkoutLineItemRemoveMutation,
@@ -37,31 +37,37 @@ export const handler = {
     query: checkoutLineItemRemoveMutation,
   },
   async fetcher({
-    input: { itemId },
+    input: input,
     options,
     fetch,
   }: HookFetcherContext<RemoveItemHook>) {
     const data = await fetch<Mutation, MutationCheckoutLineItemsRemoveArgs>({
       ...options,
-      variables: { checkoutId: getCheckoutId(), lineItemIds: [itemId] },
+      variables: { checkoutId: getCheckoutId(), lineItemIds: input },
     })
     return checkoutToCart(data.checkoutLineItemsRemove)
   },
   useHook:
     ({ fetch }: MutationHookContext<RemoveItemHook>) =>
     <T extends LineItem | undefined = undefined>(ctx: { item?: T } = {}) => {
-      const { item } = ctx
       const { mutate } = useCart()
       const removeItem: RemoveItemFn<LineItem> = async (input) => {
-        const itemId = input?.id ?? item?.id
+        let ids: string[] = []
+        const { item } = ctx
 
-        if (!itemId) {
-          throw new ValidationError({
-            message: 'Invalid input used for this operation',
-          })
+        if (input && Array.isArray(input)) {
+          ids = input.map((item) => item!.id)
+        } else {
+          const itemId = input?.id ?? item?.id
+          if (!itemId) {
+            throw new ValidationError({
+              message: 'Invalid input used for this operation',
+            })
+          }
+          ids = [itemId]
         }
 
-        const data = await fetch({ input: { itemId } })
+        const data = await fetch({ input: ids as any })
         await mutate(data, false)
         return data
       }

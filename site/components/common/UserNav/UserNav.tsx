@@ -15,13 +15,16 @@ import {
 } from '@components/ui'
 
 import type { LineItem } from '@commerce/types/cart'
+import { useGroupManager } from '@components/GroupManagerProvider'
+import { observer } from 'mobx-react'
 
 const countItem = (count: number, item: LineItem) => count + item.quantity
 
 const UserNav: React.FC<{
   className?: string
-}> = ({ className }) => {
+}> = observer(({ className }) => {
   const { data } = useCart()
+  const { gm } = useGroupManager()
   const { data: isCustomerLoggedIn } = useCustomer()
   const {
     toggleSidebar,
@@ -31,7 +34,9 @@ const UserNav: React.FC<{
     openSidebar,
   } = useUI()
 
-  const itemsCount = data?.lineItems.reduce(countItem, 0) ?? 0
+  const itemsCount = gm
+    ? gm.productItemCount
+    : data?.lineItems.reduce(countItem, 0) ?? 0
   const DropdownTrigger = isCustomerLoggedIn
     ? DropdownTriggerInst
     : React.Fragment
@@ -98,6 +103,6 @@ const UserNav: React.FC<{
       </ul>
     </nav>
   )
-}
+})
 
 export default UserNav

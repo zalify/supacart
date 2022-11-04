@@ -2,11 +2,11 @@ import { LineItem } from '@commerce/types/cart'
 import { useGroupManager } from '@components/GroupManagerProvider'
 import useCart from '@framework/cart/use-cart'
 import useAddItem from '@framework/cart/use-add-item'
-import { debounce } from 'lodash'
 import { useCallback, useMemo, useRef } from 'react'
 import useRemoveItem from '@framework/cart/use-remove-item'
 import { useRefState } from './useRefState'
 import toast from 'react-hot-toast'
+import { debounce } from 'lodash'
 
 let isChange = false
 export function useShopifyCart() {
@@ -24,8 +24,6 @@ export function useShopifyCart() {
       quantity?: number
       id?: string
     }) => {
-      if (isChange) return
-      isChange = true
       const isCheckout = !item.quantity && !item.variantId
       if (!cartData || (!gm?.isInCart() && !isCheckout)) {
         toast('「拼单进行中」的时候才能选购商品', { position: 'bottom-center' })
@@ -33,31 +31,16 @@ export function useShopifyCart() {
       }
       let { quantity = 1 } = item
       const type = quantity > 0 ? 'add' : 'remove'
-      try {
-        const newCarts = await addProductItem(item)
-        cart.mutate(newCarts)
-      } catch (error: any) {
-        if (
-          error
-            .toString()
-            .includes('Quantity must be greater than or equal to 1')
-        ) {
-          const newCarts = await removeProductItem({
-            id: item.id!,
-          })
-          cart.mutate(newCarts)
-        }
-      }
+
       if (quantity !== 0) {
-        await gm?.updateProduct(type, item.variantId, Math.abs(quantity))
+        gm?.updateProduct(type, item.variantId, Math.abs(quantity))
       }
-      isChange = false
     },
-    [addProductItem, cart, cartData, gm, removeProductItem]
+    [cartData, gm]
   )
 
   const onCallUpdateItem = useMemo(() => {
-    return async (item: LineItem, n: number) => {
+    return debounce(async (item: LineItem, n: number) => {
       diffRef.current = 0
       return addItem({
         id: item.id,
@@ -65,7 +48,7 @@ export function useShopifyCart() {
         variantId: String(item.variantId),
         quantity: n,
       })
-    }
+    }, 500)
   }, [addItem])
 
   const increaseQuantity = async (item: LineItem, n = 1) => {
@@ -74,12 +57,35 @@ export function useShopifyCart() {
   }
 
   const removeItem = async (item: LineItem) => {
-    await addItem({
-      productId: String(item.id),
-      variantId: String(item.variantId),
-      quantity: -item.quantity,
-    })
     gm?.updateProduct('remove', item.variantId, item.quantity)
+  }
+
+  const beginCheckout = async () => {
+    const variants: Record<string, number> = {}
+    gm?.products.forEach((item) => {
+      if (!variants[item.variantId]) {
+        variants[item.variantId] = 0
+      }
+
+      variants[item.variantId] += item.quantity
+    })
+
+    const data = Object.keys(variants).map((variantId) => ({
+      quantity: variants[variantId],
+      variantId,
+    }))
+
+    if (cartData.current && cartData.current.lineItems.length > 0) {
+      await removeProductItem(
+        cartData.current.lineItems.map((line) => {
+          return {
+            id: line.id,
+          }
+        })
+      )
+    }
+
+    await addProductItem(data as any)
   }
 
   return {
@@ -88,5 +94,6 @@ export function useShopifyCart() {
     addProductItem,
     increaseQuantity,
     removeItem,
+    beginCheckout,
   }
 }

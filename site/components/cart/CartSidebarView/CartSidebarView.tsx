@@ -1,5 +1,4 @@
 import cn from 'clsx'
-import Link from 'next/link'
 import { FC, useMemo, useState } from 'react'
 import s from './CartSidebarView.module.css'
 import CartItem from '../CartItem'
@@ -11,30 +10,39 @@ import usePrice from '@framework/product/use-price'
 import SidebarLayout from '@components/common/SidebarLayout'
 import { useGroupManager } from '@components/GroupManagerProvider'
 import { observer } from 'mobx-react'
+import { store } from '@lib/store'
+import { LineItem } from '@commerce/types/cart'
+import { useShopifyCart } from '@lib/hooks/useShopifyCart'
 
 const CartSidebarView: FC = observer(() => {
   const { closeSidebar, setSidebarView } = useUI()
-  const { data, isLoading, isEmpty } = useCart()
+  const cartData = useCart()
+  const { beginCheckout } = useShopifyCart()
   const { gm } = useGroupManager()
   const [doneLoading, setDoneLoading] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
 
-  const { price: subTotal } = usePrice(
-    data && {
-      amount: Number(data.subtotalPrice),
-      currencyCode: data.currency.code,
-    }
-  )
+  const isEmpty = gm ? gm.isCartEmpty : cartData.isEmpty
+  const isLoading = gm ? false : cartData.isLoading
+
+  const totalPrice = gm ? gm.totalPrice : cartData.data?.totalPrice
+
   const { price: total } = usePrice(
-    data && {
-      amount: Number(data.totalPrice),
-      currencyCode: data.currency.code,
+    cartData.data && {
+      amount: Number(totalPrice),
+      currencyCode: cartData.data.currency.code,
     }
   )
+
   const handleClose = () => closeSidebar()
   const onCheckout = async () => {
     setCheckoutLoading(true)
     await gm?.beginCheckout()
+    // 修改 shopify order
+    await beginCheckout()
+    setTimeout(() => {
+      window.location.assign('/checkout')
+    }, 100)
     setCheckoutLoading(false)
   }
 
@@ -53,22 +61,42 @@ const CartSidebarView: FC = observer(() => {
         return {
           ...member,
           products: member.products.items
-            .map((item) => {
-              const lineItem = data?.lineItems.find(
-                (lineItem) => lineItem.variantId === item.variantId
+            .map((item): LineItem | null => {
+              const matchProduct = store.state.products.find((product) =>
+                product.variants.find(
+                  (variant) => variant.id === item.variantId
+                )
               )
-              if (!lineItem) return null
+
+              const matchVariant = matchProduct?.variants.find(
+                (variant) => variant.id === item.variantId
+              )
+
+              if (!matchVariant || !matchProduct) return null
 
               return {
-                ...lineItem,
+                id: '', // line id
+                productId: matchProduct.id,
+                variantId: matchVariant.id,
                 quantity: item.quantity,
+                discounts: [],
+                variant: {
+                  image: {
+                    url: matchProduct.images?.[0].url,
+                  },
+                  name: matchProduct.name,
+                  ...matchVariant,
+                } as any,
+                path: matchProduct.path!,
+                name: matchProduct.name!,
+                options: [],
               }
             })
             .filter(Boolean),
         }
       })
       .sort((a, b) => (a.uuid === gm.userId ? -1 : 0))
-  }, [data?.lineItems, gm?.groupData?.members, gm?.userId])
+  }, [gm?.groupData?.members, gm?.userId])
 
   const error = null
   const success = null
@@ -153,7 +181,7 @@ const CartSidebarView: FC = observer(() => {
                                 <CartItem
                                   key={item.id}
                                   item={item}
-                                  currencyCode={data!.currency.code}
+                                  currencyCode={cartData.data?.currency.code!}
                                   variant={
                                     member.uuid === gm?.userId
                                       ? 'default'
@@ -171,11 +199,11 @@ const CartSidebarView: FC = observer(() => {
                       </div>
                     )
                   })
-                : data!.lineItems.map((item: any) => (
+                : cartData.data!.lineItems.map((item: any) => (
                     <CartItem
                       key={item.id}
                       item={item}
-                      currencyCode={data!.currency.code}
+                      currencyCode={cartData.data?.currency.code!}
                     />
                   ))}
             </ul>

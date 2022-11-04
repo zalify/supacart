@@ -18,16 +18,30 @@ export const handler: MutationHook<AddItemHook> = {
   fetchOptions: {
     query: checkoutLineItemAddMutation,
   },
-  async fetcher({ input: item, options, fetch }) {
-    const lineItems =
-      item.quantity === 0 && !item.variantId
-        ? []
-        : [
-            {
-              variantId: item.variantId,
-              quantity: item.quantity || 1,
-            },
-          ]
+  async fetcher({ input, options, fetch }) {
+    let lineItems: {
+      variantId: string
+      quantity: number
+    }[] = []
+
+    if (Array.isArray(input)) {
+      lineItems = input.map((item) => ({
+        variantId: item.variantId,
+        quantity: item.quantity || 1,
+      }))
+    } else {
+      const item = input
+
+      lineItems =
+        item.quantity === 0 && !item.variantId
+          ? []
+          : [
+              {
+                variantId: item.variantId,
+                quantity: item.quantity || 1,
+              },
+            ]
+    }
 
     let checkoutId = getCheckoutId()
 
@@ -53,7 +67,7 @@ export const handler: MutationHook<AddItemHook> = {
       const { mutate } = useCart()
       return useCallback(
         async function addItem(input) {
-          const data = await fetch({ input })
+          const data = await (fetch as any)({ input })
           await mutate(data, false)
           return data
         },
