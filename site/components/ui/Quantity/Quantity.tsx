@@ -18,7 +18,7 @@ const Quantity: FC<QuantityProps> = ({
   decrease,
   handleChange,
   handleRemove,
-  max = 6,
+  max = 20,
   disabled,
 }) => {
   return (
