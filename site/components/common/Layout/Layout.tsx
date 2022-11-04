@@ -391,9 +391,9 @@ const GroupDisplay = observer(() => {
   // if (gm?.hasGroup() && !gm?.isInCart())
   //   return (
   // <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-  //   <Text className=""> </Text>在等待团长支付「拼单」</h6>
+  //   <Text className=""> </Text>在等待组长支付「组队」</h6>
   //   <Button  className="w-full mt-4" onClick={onReset}>
-  //     结束「拼单」并重新发起
+  //     结束「组队」并重新发起
   //   </Button>
   // </div>
   //   )
@@ -407,7 +407,7 @@ const GroupDisplay = observer(() => {
           <div className="w-[250px] bg-primary text-primary p-4 border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
             <Text variant="cardHeading">
               你当前和 {gm.getOwner?.nickname}{' '}
-              的拼单还在进行中，看上去又点击了一个新的拼单链接
+              的组队还在进行中，看上去又点击了一个新的组队链接
             </Text>
 
             <Button
@@ -415,7 +415,7 @@ const GroupDisplay = observer(() => {
               className="w-full mt-4"
               onClick={onGoOldGroup}
             >
-              回到 {gm.getOwner?.nickname} 的拼单
+              回到 {gm.getOwner?.nickname} 的组队
             </Button>
             <Text variant="body" className="mt-4 !text-sm text-center">
               或者
@@ -425,7 +425,7 @@ const GroupDisplay = observer(() => {
               className="w-full mt-4"
               onClick={onGoNewGroup}
             >
-              加入新的拼单
+              加入新的组队
             </Button>
           </div>
         </div>
@@ -437,33 +437,43 @@ const GroupDisplay = observer(() => {
     if (gm?.isCheckout()) {
       return (
         <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-          <Text variant="cardHeading">团长正在结账中</Text>
+          <Text variant="cardHeading">组长正在结账中</Text>
           <Text variant="body" className="mt-2 !text-sm">
-            你可以关闭此页面或以团长的身份重新发起「拼单」
+            你可以关闭此页面或以组长的身份重新发起「组队」
           </Text>
 
           <Button className="w-full mt-4" onClick={onReset}>
-            重新发起「拼单」
+            重新发起「组队」
           </Button>
         </div>
       )
     } else if (gm?.isInCart()) {
       return (
         <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-          <Text variant="cardHeading">「拼单」进行中</Text>
+          <div className="flex items-center justify-between mb-4">
+            <Text variant="cardHeading">「组队中」</Text>
+            <Button
+              variant="slim"
+              className="!px-2 !py-1 !text-xs"
+              onClick={onReset}
+              loading={loading}
+            >
+              离开组队
+            </Button>
+          </div>
           <div className="flex space-x-1">
-            <div>成员：</div>
+            <div>组员：</div>
             {gm.groupData?.members.map((m) => (
               <div key={m.uuid} className="flex flex-col items-center">
                 <div className="text-secondary capitalize rounded-full bg-secondary text-sm px-2 py-0.5">
                   {m.nickname}
-                  {m.role === 'Owner' ? ' - 团长' : ''}
+                  {m.role === 'Owner' ? ' - 组长' : ''}
                 </div>
               </div>
             ))}
           </div>
           <Button className="w-full mt-4" onClick={onShare}>
-            邀请更多好友参与「拼单」
+            邀请更多好友参与「组队」
           </Button>
         </div>
       )
@@ -483,7 +493,7 @@ const GroupDisplay = observer(() => {
       <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
         <div className="flex items-center justify-between mb-4">
           <Text variant="cardHeading" className="!mb-0">
-            {gm?.getOwner?.nickname} 邀请你加入「拼单」
+            {gm?.getOwner?.nickname} 邀请你加入「组队」
           </Text>
           <Button variant="slim" onClick={onReset} loading={loading}>
             自己逛逛
@@ -491,8 +501,8 @@ const GroupDisplay = observer(() => {
         </div>
 
         <div className="mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
-          你将作为成员加入{gm?.getOwner?.nickname}的「拼单」一起选购 DevJoy
-          的周边产品，完成选购后即可关闭此页面，由团长 {gm?.getOwner?.nickname}{' '}
+          你将作为成员加入{gm?.getOwner?.nickname}的「组队」一起选购 DevJoy
+          的周边产品，完成选购后即可关闭此页面，由组长 {gm?.getOwner?.nickname}{' '}
           完成结账。
         </div>
 
@@ -517,12 +527,12 @@ const GroupDisplay = observer(() => {
         {gm?.groupData && JSON.stringify(gm?.groupData, null, 2)}
       </p> */}
       <Text variant="cardHeading" className="">
-        发起「拼单」
+        发起「组队」
       </Text>
 
       <div className="mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
-        你作为团长发起拼单，邀请至少一位朋友👬一起选购 DevJoy
-        的周边产品，最终由团长独自完成下单即可。
+        你作为组长发起组队，邀请至少一位朋友👬一起选购 DevJoy
+        的周边产品，最终由组长独自完成下单即可。
       </div>
 
       {/* <p>
@@ -554,10 +564,10 @@ const GroupDisplay = observer(() => {
             onClick={onOpen}
             loading={loading}
           >
-            先独自逛逛
+            独自逛逛
           </Button>
           <Button className="w-full mt-4" onClick={onOpen} loading={loading}>
-            发起「拼单」
+            发起
           </Button>
         </div>
       </div>
