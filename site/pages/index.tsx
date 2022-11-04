@@ -54,7 +54,8 @@ export default function Home({
           <>
             <div className="mb-4">
               Supacart is a demo project about Realtime co-shopping e-commence
-              built with Shopify Storefront API, Next.js, Upstash and YoMo.
+              at Edge built with Shopify Storefront API, Next.js, Upstash and
+              YoMo.
             </div>
             <Link href="/about">
               <a className="underline">Read more →</a>
