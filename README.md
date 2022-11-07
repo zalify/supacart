@@ -4,7 +4,7 @@ Supacart is an open-source Shopify store Framework for building online shopping 
 
 Official Website: [https://supac.art/](https://supac.art/)
 
-### First, you need to copy .env.template to .env, then populate all variables.
+### First, you need to copy site/.env.template to site/.env, then populate all variables.
 
 ```bash
 NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=
@@ -26,6 +26,8 @@ REDIS_URL=
   pnpm run dev
 
 ```
+
+Now you can see the content at http://localhost:3000
 
 ### Production
 
