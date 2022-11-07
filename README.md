@@ -1,10 +1,10 @@
-## Start
+## Supacart
 
 Supacart is an open-source Shopify store Framework for building online shopping for multiple people with real-time synchronization.
 
 Official Website: [https://supac.art/](https://supac.art/)
 
-### First you need to copy .env.template to .env, then populate all variables.
+### First, you need to copy .env.template to .env, then populate all variables.
 
 ```bash
 NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=

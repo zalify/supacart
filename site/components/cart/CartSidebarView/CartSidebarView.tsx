@@ -161,7 +161,7 @@ const CartSidebarView: FC = observer(() => {
               <a> */}
             <Text variant="sectionHeading">
               购物车 ({gm?.isInCart() && '选购中'}
-              {gm?.isCheckout() && '团长结账中'})
+              {gm?.isCheckout() && '组长结账中'})
             </Text>
             {/* </a>
             </Link> */}
@@ -176,7 +176,7 @@ const CartSidebarView: FC = observer(() => {
                             {member.uuid === gm?.currentMember?.uuid
                               ? ` (我)`
                               : null}
-                            {member.role === 'Owner' ? ` - 团长` : ''}
+                            {member.role === 'Owner' ? ` - 组长` : ''}
                           </span>
                           <span
                             className={cn(
@@ -289,7 +289,7 @@ const CartSidebarView: FC = observer(() => {
                         width="100%"
                         loading={doneLoading}
                       >
-                        等待团长完成支付
+                        等待组长完成支付
                       </Button>
                     )}
                     {gm.isComplete() && (
@@ -299,7 +299,7 @@ const CartSidebarView: FC = observer(() => {
                         width="100%"
                         loading={doneLoading}
                       >
-                        团长已完成支付
+                        组长已完成支付
                       </Button>
                     )}
                   </>

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { Page } from '@commerce/types/page'
 import getSlug from '@lib/get-slug'
-import { Github, Vercel } from '@components/icons'
+import { Github, Vercel, Upstash, Shopify } from '@components/icons'
 import { Logo, Container } from '@components/ui'
 import { I18nWidget } from '@components/common'
 import s from './Footer.module.css'
@@ -65,24 +65,63 @@ const Footer: FC<Props> = ({ className, pages }) => {
             </div>
           </div> */}
         </div>
-        <div className="pt-6 pb-10 flex flex-col md:flex-row justify-between items-center space-y-4 text-accent-6 text-sm">
+        <div className="pt-6 pb-10 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-accent-6 text-sm">
           <div>
             <span>&copy; 2022 Zalify, Inc. All rights reserved.</span>
           </div>
-          <div className="flex items-center text-primary text-sm">
-            <span className="text-primary">Created by</span>
-            <a
-              rel="noopener noreferrer"
-              href="https://vercel.com"
-              aria-label="Vercel.com Link"
-              target="_blank"
-              className="text-primary"
-            >
-              <Vercel
-                className="inline-block h-6 ml-3 text-primary"
-                alt="Vercel.com Logo"
-              />
-            </a>
+          <div className="flex flex-col md:flex-row items-center text-primary text-sm">
+            <span className="text-primary mb-4 md:mb-0">Powered by</span>
+            <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0">
+              <a
+                rel="noopener noreferrer"
+                href="https://vercel.com"
+                aria-label="Vercel.com Link"
+                target="_blank"
+                className="text-primary"
+              >
+                <Vercel
+                  className="inline-block h-6 ml-3 text-primary"
+                  alt="Vercel.com Logo"
+                />
+              </a>
+              <a
+                rel="noopener noreferrer"
+                href="https://upstash.com/"
+                aria-label="upstash.com Link"
+                target="_blank"
+                className="text-primary"
+              >
+                <Upstash
+                  className="inline-block h-6 ml-3 text-primary"
+                  alt="Upstash Logo"
+                />
+              </a>
+              <a
+                rel="noopener noreferrer"
+                href="https://www.yomo.run/"
+                aria-label="yomo.run Link"
+                target="_blank"
+                className="text-primary"
+              >
+                <img
+                  className="inline-block h-6 ml-3 text-primary"
+                  src="https://www.yomo.run/images/logo4.png"
+                  alt="YoMo Logo"
+                />
+              </a>
+              <a
+                rel="noopener noreferrer"
+                href="https://www.shopify.com/"
+                aria-label="shopify.com Link"
+                target="_blank"
+                className="text-primary"
+              >
+                <Shopify
+                  className="inline-block h-6 ml-3 w-auto text-primary"
+                  alt="Shopify Logo"
+                />
+              </a>
+            </div>
           </div>
         </div>
       </Container>

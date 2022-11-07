@@ -1,9 +1,10 @@
 import commerce from '@lib/api/commerce'
 import { Layout } from '@components/common'
 import { ProductCard } from '@components/product'
-import { Grid, Marquee, Hero } from '@components/ui'
+import { Grid, Marquee, Hero, Text } from '@components/ui'
 // import HomeAllProductsGrid from '@components/common/HomeAllProductsGrid'
 import type { GetStaticPropsContext, InferGetStaticPropsType } from 'next'
+import Link from 'next/link'
 
 export async function getStaticProps({
   preview,
@@ -51,20 +52,14 @@ export default function Home({
         headline="SupaCart by Zalify"
         description={
           <>
-            <div>
-              这是一款由 Zalify 团队基于 Shopify Storefront API, Next.js
-              Commerce, YoMo.Run 研发的面向全球消费者的实时拼单演示项目。
+            <div className="mb-4">
+              Supacart is a demo project about Realtime co-shopping e-commence
+              at Edge built with Shopify Storefront API, Next.js, Upstash and
+              YoMo.
             </div>
-            {/* <p>
-              <a
-                className="underline"
-                href="https://github.com/zalify/supacart"
-                rel="noreferrer"
-                target="_blank"
-              >
-                Open Source at GitHub →
-              </a>
-            </p> */}
+            <Link href="/about">
+              <a className="underline">Read more →</a>
+            </Link>
           </>
         }
       />
