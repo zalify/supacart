@@ -67,7 +67,7 @@ const ProductSidebar: FC<ProductSidebarProps> = ({ product, className }) => {
             loading={loading}
             disabled={variant?.availableForSale === false}
           >
-            {variant?.availableForSale === false ? '缺货中...' : '加到购物车'}
+            {variant?.availableForSale === false ? 'Pre-order' : 'Add to cart'}
           </Button>
         )}
       </div>

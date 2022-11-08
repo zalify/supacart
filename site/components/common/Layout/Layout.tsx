@@ -256,7 +256,7 @@ const GroupDisplay = observer(() => {
   const { query } = router
   const onOpen = async () => {
     if (!email) {
-      toast.error('昵称不能为空', { position: 'bottom-center' })
+      toast.error('Name can not be empty', { position: 'bottom-center' })
       return
     }
     setLoading(true)
@@ -266,7 +266,7 @@ const GroupDisplay = observer(() => {
       if (!cookie) {
         cartData = await addProductItem({
           quantity: 0,
-          variantId: '', // 没有 variantId && quantity =0 只会创建 checkout
+          variantId: '', // if no variantId, only set quantity =0 will lead to create a checkout instead of cart
         })
       }
       const cartId = cartData!.id
@@ -288,7 +288,7 @@ const GroupDisplay = observer(() => {
   }
   const onJoin = async () => {
     if (!email) {
-      toast.error('昵称不能为空', { position: 'bottom-center' })
+      toast.error('Name can not be empty', { position: 'bottom-center' })
       return
     }
     setLoading(true)
@@ -316,18 +316,22 @@ const GroupDisplay = observer(() => {
     if ('share' in navigator) {
       navigator
         .share({
-          title: `快来加入 ${gm?.getOwner?.nickname} 一起选购 DevJoy 的周边产品吧！`,
+          title: `Join ${gm?.getOwner?.nickname} to pick some good stuff from DevJoy.`,
           url: url,
         })
         .then(() => {
-          toast.success('邀请链接已复制！', { position: 'bottom-center' })
+          toast.success('Invitation link has been copied!', {
+            position: 'bottom-center',
+          })
         })
         .catch(console.error)
     } else {
       copy(
-        `快来加入 ${gm?.getOwner?.nickname} 一起选购 DevJoy 的周边产品吧！${url}`
+        `Join ${gm?.getOwner?.nickname} to pick some good stuff from DevJoy: ${url}`
       )
-      toast.success('邀请链接已复制！', { position: 'bottom-center' })
+      toast.success('Invitation link has been copied!', {
+        position: 'bottom-center',
+      })
     }
   }
 
@@ -388,26 +392,14 @@ const GroupDisplay = observer(() => {
 
   const isJoined = gm?.currentMember
 
-  // if (gm?.hasGroup() && !gm?.isInCart())
-  //   return (
-  // <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-  //   <Text className=""> </Text>在等待组长支付「组队」</h6>
-  //   <Button  className="w-full mt-4" onClick={onReset}>
-  //     结束「组队」并重新发起
-  //   </Button>
-  // </div>
-  //   )
-
-  // if (gm?.inited !== true) return null
-
   if (query.g && gm?.groupId && query.g !== gm.groupId) {
     return (
       <div className="fixed inset-0 backdrop-blur-sm bg-black/40 text-primary z-50 p-3">
         <div className="flex items-center justify-center h-full">
           <div className="w-[250px] bg-primary text-primary p-4 border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
             <Text variant="cardHeading">
-              你当前和 {gm.getOwner?.nickname}{' '}
-              的组队还在进行中，看上去又点击了一个新的组队链接
+              Your current Team with {gm.getOwner?.nickname} is still in
+              progress, and it looks like a new Team link was clicked
             </Text>
 
             <Button
@@ -415,17 +407,17 @@ const GroupDisplay = observer(() => {
               className="w-full mt-4"
               onClick={onGoOldGroup}
             >
-              回到 {gm.getOwner?.nickname} 的组队
+              Go back to {gm.getOwner?.nickname}'s Team
             </Button>
             <Text variant="body" className="mt-4 !text-sm text-center">
-              或者
+              Or
             </Text>
             <Button
               variant="slim"
               className="w-full mt-4"
               onClick={onGoNewGroup}
             >
-              加入新的组队
+              Join the new Team
             </Button>
           </div>
         </div>
@@ -437,13 +429,13 @@ const GroupDisplay = observer(() => {
     if (gm?.isCheckout()) {
       return (
         <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
-          <Text variant="cardHeading">组长正在结账中</Text>
+          <Text variant="cardHeading">The Team leader is checkouting out</Text>
           <Text variant="body" className="mt-2 !text-sm">
-            你可以关闭此页面或以组长的身份重新发起「组队」
+            You can close this page or open a new team as a Team leader
           </Text>
 
           <Button className="w-full mt-4" onClick={onReset}>
-            重新发起「组队」
+            Re-open a Team
           </Button>
         </div>
       )
@@ -451,29 +443,29 @@ const GroupDisplay = observer(() => {
       return (
         <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
           <div className="flex items-center justify-between mb-4">
-            <Text variant="cardHeading">「组队中」</Text>
+            <Text variant="cardHeading">In Team</Text>
             <Button
               variant="slim"
               className="!px-2 !py-1 !text-xs"
               onClick={onReset}
               loading={loading}
             >
-              离开组队
+              Leave Team
             </Button>
           </div>
           <div className="flex space-x-1">
-            <div>组员：</div>
+            <div>Team members: </div>
             {gm.groupData?.members.map((m) => (
               <div key={m.uuid} className="flex flex-col items-center">
                 <div className="text-secondary capitalize rounded-full bg-secondary text-sm px-2 py-0.5">
                   {m.nickname}
-                  {m.role === 'Owner' ? ' - 组长' : ''}
+                  {m.role === 'Owner' ? ' - Team leader' : ''}
                 </div>
               </div>
             ))}
           </div>
           <Button className="w-full mt-4" onClick={onShare}>
-            邀请更多好友参与「组队」
+            Invite more friends to join the Team
           </Button>
         </div>
       )
@@ -481,7 +473,7 @@ const GroupDisplay = observer(() => {
       return (
         <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
           <Button className="w-full mt-4" onClick={onReset}>
-            重置
+            Reset Team
           </Button>
         </div>
       )
@@ -493,29 +485,29 @@ const GroupDisplay = observer(() => {
       <div className="fixed bottom-0 bg-primary z-50 w-full left-0 p-3 border-t border-slate-300">
         <div className="flex items-center justify-between mb-4">
           <Text variant="cardHeading" className="!mb-0">
-            {gm?.getOwner?.nickname} 邀请你加入「组队」
+            {gm?.getOwner?.nickname} invites you to join Team
           </Text>
           <Button variant="slim" onClick={onReset} loading={loading}>
-            自己逛逛
+            Just look around
           </Button>
         </div>
 
         <div className="mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
-          你将作为成员加入{gm?.getOwner?.nickname}的「组队」一起选购 DevJoy
-          的周边产品，完成选购后即可关闭此页面，由组长 {gm?.getOwner?.nickname}{' '}
-          完成结账。
+          You will join {gm?.getOwner?.nickname}'s Team as a member to shop for
+          DevJoy. Once you have finished shopping, you can close this page and
+          the team leader {gm?.getOwner?.nickname} will complete the checkout.
         </div>
 
         <div>
           <input
             className="form-input w-full mt-4"
-            placeholder="你的昵称"
+            placeholder="Your Name"
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="mt-4 flex space-x-4">
           <Button className="w-full" onClick={onJoin} loading={loading}>
-            加入
+            Join
           </Button>
         </div>
       </div>
@@ -527,32 +519,20 @@ const GroupDisplay = observer(() => {
         {gm?.groupData && JSON.stringify(gm?.groupData, null, 2)}
       </p> */}
       <Text variant="cardHeading" className="">
-        发起「组队」
+        Start Team
       </Text>
 
       <div className="mt-3 p-2 text-sm border-2 border-lime-400 rounded shadow-[0.5rem_-0.5rem_#d9f99d]">
-        你作为组长发起组队，邀请至少一位朋友👬一起选购 DevJoy
-        的周边产品，最终由组长独自完成下单即可。
+        You, as the team leader, start a team and invite at least one friend 👬
+        to shop together for DevJoy. The leader of the group will place the
+        order alone.
       </div>
-
-      {/* <p>
-        <Button onClick={onReset}>Reset to new</Button>
-      </p> */}
-      {/* <div>
-        
-        {gm?.isCheckout() && (
-          <span style={{ color: 'red', fontSize: 30 }}>group has checkout</span>
-        )}
-        {gm?.isComplete() && (
-          <span style={{ color: 'red', fontSize: 30 }}>group has complete</span>
-        )}
-      </div> */}
 
       <div>
         <div>
           <input
             className="form-input w-full mt-4"
-            placeholder="你的昵称"
+            placeholder="Your Name"
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
@@ -564,10 +544,10 @@ const GroupDisplay = observer(() => {
             onClick={onOpen}
             loading={loading}
           >
-            独自逛逛
+            Just look around
           </Button>
           <Button className="w-full mt-4" onClick={onOpen} loading={loading}>
-            发起
+            Start Team
           </Button>
         </div>
       </div>

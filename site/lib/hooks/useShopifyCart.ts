@@ -26,7 +26,9 @@ export function useShopifyCart() {
     }) => {
       const isCheckout = !item.quantity && !item.variantId
       if (!cartData || (!gm?.isInCart() && !isCheckout)) {
-        toast('「拼单进行中」的时候才能选购商品', { position: 'bottom-center' })
+        toast('You can only shop when you are in Team', {
+          position: 'bottom-center',
+        })
         throw new Error('Not in cart')
       }
       let { quantity = 1 } = item

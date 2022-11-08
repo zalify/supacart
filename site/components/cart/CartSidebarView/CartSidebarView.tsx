@@ -53,7 +53,7 @@ const CartSidebarView: FC = observer(() => {
   const onCheckout = async () => {
     setCheckoutLoading(true)
     await gm?.beginCheckout()
-    // 修改 shopify order
+    // Update shopify order
     await beginCheckout()
     setTimeout(() => {
       window.location.assign('/checkout')
@@ -129,10 +129,10 @@ const CartSidebarView: FC = observer(() => {
             <Bag className="absolute" />
           </span>
           <h2 className="pt-6 text-2xl font-bold tracking-wide text-center">
-            购物车是空的
+            The cart is empty
           </h2>
           <p className="text-accent-3 px-10 text-center pt-2">
-            邀请更多好友参与「拼单」吧！
+            Invite more friends to join your team!
           </p>
         </div>
       ) : error ? (
@@ -160,8 +160,8 @@ const CartSidebarView: FC = observer(() => {
             {/* <Link href="/cart">
               <a> */}
             <Text variant="sectionHeading">
-              购物车 ({gm?.isInCart() && '选购中'}
-              {gm?.isCheckout() && '组长结账中'})
+              Cart ({gm?.isInCart() && 'In Team'}
+              {gm?.isCheckout() && 'The team leader is checking out'})
             </Text>
             {/* </a>
             </Link> */}
@@ -174,9 +174,11 @@ const CartSidebarView: FC = observer(() => {
                           <span className="capitalize">
                             {member.email}
                             {member.uuid === gm?.currentMember?.uuid
-                              ? ` (我)`
+                              ? ` (Me)`
                               : null}
-                            {member.role === 'Owner' ? ` - 组长` : ''}
+                            {member.role === 'Owner'
+                              ? ` - The team leader`
+                              : ''}
                           </span>
                           <span
                             className={cn(
@@ -186,7 +188,7 @@ const CartSidebarView: FC = observer(() => {
                                 : ' bg-orange-100 text-orange-800'
                             )}
                           >
-                            {member.done ? '选购完成' : '正在选购'}
+                            {member.done ? 'Team is closed' : 'In Team'}
                           </span>
                         </div>
                         <ul>
@@ -207,7 +209,7 @@ const CartSidebarView: FC = observer(() => {
                             })
                           ) : (
                             <p className="text-sm text-slate-900 py-2">
-                              TA的购物车是空的
+                              The cart is empty
                             </p>
                           )}
                         </ul>
@@ -228,17 +230,17 @@ const CartSidebarView: FC = observer(() => {
             {discountPrice > 0 && (
               <ul className="pb-2">
                 <li className="flex justify-between py-1">
-                  <span>小计</span>
+                  <span>Subtotal</span>
                   <span>{subTotal}</span>
                 </li>
                 <li className="flex justify-between py-1">
-                  <span>折扣</span>
+                  <span>Discount</span>
                   <span>{discount}</span>
                 </li>
               </ul>
             )}
             <div className="flex justify-between py-3 font-bold mb-2">
-              <span>总计</span>
+              <span>Total</span>
               <span>{total}</span>
             </div>
             {gm ? (
@@ -252,7 +254,7 @@ const CartSidebarView: FC = observer(() => {
                         Component="a"
                         width="100%"
                       >
-                        前往支付
+                        Proceed to Checkout
                       </Button>
                       {/* <div>----</div>
                       <Button
@@ -266,7 +268,7 @@ const CartSidebarView: FC = observer(() => {
                   ) : (
                     <>
                       <Button onClick={onCheckout} Component="a" width="100%">
-                        前往支付
+                        Proceed to Checkout
                       </Button>
                     </>
                   )
@@ -279,7 +281,7 @@ const CartSidebarView: FC = observer(() => {
                         width="100%"
                         loading={doneLoading}
                       >
-                        <>{gm.isDone() ? '继续选购' : '完成选购'}</>
+                        <>{gm.isDone() ? 'Keep shopping' : 'Finished'}</>
                       </Button>
                     )}
                     {gm.isCheckout() && (
@@ -289,7 +291,8 @@ const CartSidebarView: FC = observer(() => {
                         width="100%"
                         loading={doneLoading}
                       >
-                        等待组长完成支付
+                        The team leader is completing payment, you can close the
+                        tab now.
                       </Button>
                     )}
                     {gm.isComplete() && (
@@ -299,7 +302,7 @@ const CartSidebarView: FC = observer(() => {
                         width="100%"
                         loading={doneLoading}
                       >
-                        组长已完成支付
+                        The team leader has completed payment
                       </Button>
                     )}
                   </>
