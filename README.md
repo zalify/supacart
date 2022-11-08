@@ -1,5 +1,7 @@
 ## Supacart
 
+![powered by Next.js, Upstash, YomoRun and Shopify](./docs/logos.jpg)
+
 Supacart is an open-source Shopify store Framework for building online shopping for multiple people with real-time synchronization.
 
 Official Website: [https://supac.art/](https://supac.art/)
